@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MachineryHub - Rent & Buy Heavy Machinery</title>
+<title>medish machinary - Rent & Buy Heavy Machinery</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -114,7 +114,7 @@
 <nav class="bg-industrial-gray text-white px-4 md:px-8 py-4 flex justify-between items-center shadow-lg sticky top-0 z-40">
   <div class="flex items-center space-x-3">
     <div class="gear-icon bg-industrial-yellow p-2 rounded-lg"></div>
-    <h1 class="font-heading font-bold text-xl md:text-2xl tracking-tight">Machinery<span class="text-industrial-yellow">Hub</span></h1>
+    <h1 class="font-heading font-bold text-xl md:text-2xl tracking-tight">Medish <span class="text-industrial-yellow">Mashinary</span></h1>
   </div>
   <div class="flex items-center space-x-4 md:space-x-6">
     <button onclick="openOrders()" class="relative p-2 hover:bg-white/10 rounded-lg transition-colors">
@@ -129,6 +129,9 @@
       <span class="text-xl md:text-2xl">🛒</span>
       <span id="cartBadge" class="absolute -top-1 -right-1 bg-industrial-yellow text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
     </button>
+        <a href="admin.html" class="text-sm md:text-base hover:text-industrial-yellow transition-colors duration-200 p-2">
+      👤
+    </a>
   </div>
 </nav>
 
@@ -200,7 +203,7 @@
 <!-- Trust Indicators Section -->
 <section class="bg-white py-12 md:py-16 px-4 md:px-8 mt-8 md:mt-12 shadow-inner">
   <div class="max-w-6xl mx-auto">
-    <h3 class="font-heading text-2xl md:text-3xl font-bold text-center mb-10 md:mb-12 text-industrial-gray">Why Choose MachineryHub?</h3>
+    <h3 class="font-heading text-2xl md:text-3xl font-bold text-center mb-10 md:mb-12 text-industrial-gray">Why Choose medish machinary?</h3>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
       <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white shadow-card hover:shadow-card-hover transition-all duration-300">
         <div class="text-4xl mb-4">🛡️</div>
@@ -479,7 +482,7 @@
             <li>Use the Order ID shown on confirmation as payment reference</li>
             <li>Send payment to account details shown above</li>
             <li>Your booking will be confirmed within 24 hours after payment verification</li>
-            <li>Contact support@machineryhub.com for assistance</li>
+            <li>Contact support@medish machinary.com for assistance</li>
           </ol>
         </div>
         
@@ -594,14 +597,14 @@
     <div class="col-span-1 md:col-span-2">
       <div class="flex items-center space-x-3 mb-4">
         <div class="gear-icon bg-industrial-yellow p-2 rounded-lg"></div>
-        <h3 class="font-heading font-bold text-2xl">Machinery<span class="text-industrial-yellow">Hub</span></h3>
+        <h3 class="font-heading font-bold text-2xl">Medish<span class="text-industrial-yellow">Machinary</span></h3>
       </div>
       <p class="text-gray-400 text-sm max-w-xs">Connecting projects with the best machinery. Rent or buy with confidence.</p>
     </div>
     <div>
       <h4 class="font-bold mb-4 text-industrial-yellow">Contact</h4>
       <p class="text-gray-400 text-sm">📞 (555) 123-4567</p>
-      <p class="text-gray-400 text-sm">✉️ support@machineryhub.com</p>
+      <p class="text-gray-400 text-sm">✉️ support@medish machinary.com</p>
     </div>
     <div>
       <h4 class="font-bold mb-4 text-industrial-yellow">Office</h4>
@@ -611,7 +614,7 @@
     </div>
   </div>
   <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-    © 2024 MachineryHub. All rights reserved. | <span class="text-industrial-yellow">🔒 Secure Booking</span>
+    © 2024 medish machinary. All rights reserved. | <span class="text-industrial-yellow">🔒 Secure Booking</span>
   </div>
 </footer>
 
@@ -639,7 +642,6 @@ const machineTypes = {
   WATER_TRUCK: 'Water Truck',
   DUMP_TRUCK: 'Dump Truck'
 };
-
 // Initial Data Seeding
 const initialMachines = [
   {
@@ -648,7 +650,7 @@ const initialMachines = [
     listingType: 'Rent',
     name: "CAT 320D Excavator",
     price: 350,
-    image: "https://images.unsplash.com/photo-1579761596207-6c2306f1d07c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://www.bossmachinery.nl/data/images/vehicles/l_01_Caterpillar%20320D%20-%20BM3815_005.JPG",
     status: "Available",
     condition: "Excellent",
     rating: 4.8,
@@ -674,13 +676,14 @@ const initialMachines = [
       mobility: "Chain (Track)"
     }
   },
+
   {
     id: 102,
     type: machineTypes.DOZER,
     listingType: 'Sale',
     name: "Komatsu D155A Dozer",
     price: 185000,
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKU_nzWFa7ctch_Zf8Fi8ygfSBwmKTi9Z9fA&s",
     status: "Available",
     condition: "Excellent",
     rating: 4.7,
@@ -706,13 +709,14 @@ const initialMachines = [
       ripper: "Multi-Shank"
     }
   },
+
   {
     id: 103,
     type: machineTypes.GRADER,
     listingType: 'Rent',
     name: "Motor Grader 140K",
     price: 400,
-    image: "https://images.unsplash.com/photo-1626863066378-43890f8450c2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8S_CiqyKRCUS0uCB-9fl4cUFZDAFln5cwlg&s",
     status: "Rented",
     condition: "Good",
     rating: 4.6,
@@ -737,13 +741,14 @@ const initialMachines = [
       bladeWidth: "4.2 m"
     }
   },
+
   {
     id: 104,
     type: machineTypes.LOADER,
     listingType: 'Rent',
     name: "Wheel Loader 966H",
     price: 300,
-    image: "https://images.unsplash.com/photo-1628174780590-7f9a46f7f63b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_1PaSgo3GLuWKv1kNZ20ZsO1i_rGghU1Obg&s",
     status: "Available",
     condition: "Excellent",
     rating: 4.9,
@@ -769,13 +774,14 @@ const initialMachines = [
       reach: "2.5 m"
     }
   },
+
   {
     id: 105,
     type: machineTypes.ROLLER,
     listingType: 'Sale',
     name: "Vibratory Roller SD110",
     price: 45000,
-    image: "https://images.unsplash.com/photo-1549419163-95249e29a98e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFSVsugy1_W4cqHnaK8KLDuQahJFq7_6XcXA&s",
     status: "Available",
     condition: "Good",
     rating: 4.5,
@@ -801,13 +807,14 @@ const initialMachines = [
       vibrationFrequency: "33 Hz"
     }
   },
+
   {
     id: 106,
     type: machineTypes.CRANE,
     listingType: 'Rent',
     name: "Mobile Crane 50T",
     price: 600,
-    image: "https://images.unsplash.com/photo-1547466849-c187af5497b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe-0_YlbpfzSZhEjUbo-HJbziEj6FZDatmcQ&s",
     status: "Available",
     condition: "Good",
     rating: 4.4,
@@ -833,13 +840,14 @@ const initialMachines = [
       maxReach: "15 m"
     }
   },
+
   {
     id: 107,
     type: machineTypes.WATER_TRUCK,
     listingType: 'Rent',
     name: "Water Tanker",
     price: 150,
-    image: "https://images.unsplash.com/photo-1599388047970-d7af99580b08?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT986-Gu62CB-Rso3DwODHiYc4QZigQqeNxcQ&s",
     status: "Available",
     condition: "Good",
     rating: 4.3,
@@ -864,13 +872,14 @@ const initialMachines = [
       discharge: "Pump Powered"
     }
   },
+
   {
     id: 108,
     type: machineTypes.DUMP_TRUCK,
     listingType: 'Rent',
     name: "Heavy Dump Truck",
     price: 250,
-    image: "https://images.unsplash.com/photo-1615828236377-5264871d87d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDdeOX2_MKXEY6xBqnozjGx8rF9Ix4x9c77Q&s",
     status: "Available",
     condition: "Excellent",
     rating: 4.8,
@@ -896,13 +905,14 @@ const initialMachines = [
       fuelType: "Diesel"
     }
   },
+
   {
     id: 109,
     type: machineTypes.EXCAVATOR,
     listingType: 'Sale',
     name: "Mini Excavator 1.8T",
     price: 32000,
-    image: "https://images.unsplash.com/photo-1579761596207-6c2306f1d07c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3jqbJKdciLP79mU3fwx2Yc6Zx0fiek9g8DQ&s",
     status: "Available",
     condition: "New",
     rating: 4.9,
@@ -2273,7 +2283,7 @@ function showPaymentInstructions(orderId) {
           <ul class="list-disc pl-5 space-y-2 text-gray-600">
             <li>Your booking will be confirmed within 24 hours after payment verification</li>
             <li>Keep your payment receipt/screenshot for reference</li>
-            <li>Contact support@machineryhub.com for assistance</li>
+            <li>Contact support@medish machinary.com for assistance</li>
             <li>Order will be automatically cancelled after 48 hours if payment is not received</li>
           </ul>
         </div>
