@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Machinery Rental System</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<!-- HEADER -->
+<header class="bg-slate-900 text-white p-4 flex justify-between items-center">
+  <h1 class="text-xl font-bold">Machinery Rental</h1>
+  <div class="space-x-2">
+    <button id="customerBtn" class="px-4 py-1 bg-slate-700 rounded">Customer</button>
+    <button id="adminBtn" class="px-4 py-1 bg-slate-700 rounded">Admin</button>
+  </div>
+</header>
+
+<!-- CUSTOMER VIEW -->
+<section id="customerView" class="p-6">
+  <h2 class="text-2xl font-semibold mb-4">Available Machines</h2>
+
+  <div id="machineGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+</section>
+
+<!-- ADMIN LOGIN -->
+<section id="adminLogin" class="hidden p-6 max-w-md mx-auto">
+  <div class="bg-white p-6 rounded shadow">
+    <h2 class="text-xl font-semibold mb-4">Admin Login</h2>
+    <form id="loginForm" class="space-y-4">
+      <input id="username" class="w-full border p-2 rounded" placeholder="Username" required>
+      <input id="password" type="password" class="w-full border p-2 rounded" placeholder="Password" required>
+      <button class="w-full bg-blue-600 text-white py-2 rounded">Login</button>
+    </form>
+    <p id="loginError" class="text-red-500 text-sm mt-2 hidden">Invalid credentials</p>
+  </div>
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<section id="adminDashboard" class="hidden p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-semibold">Admin Dashboard</h2>
+    <button id="logoutBtn" class="bg-red-600 text-white px-4 py-1 rounded">Logout</button>
+  </div>
+
+  <button id="addMachineBtn" class="mb-4 bg-green-600 text-white px-4 py-2 rounded">
+    Add Machine
+  </button>
+
+  <div id="adminMachineGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+</section>
+
+<!-- MODAL -->
+<div id="machineModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+  <div class="bg-white p-6 rounded w-full max-w-md">
+    <h3 id="modalTitle" class="text-lg font-semibold mb-4">Add Machine</h3>
+    <form id="machineForm" class="space-y-3">
+      <input id="mName" class="w-full border p-2 rounded" placeholder="Machine Name" required>
+      <input id="mPrice" type="number" class="w-full border p-2 rounded" placeholder="Price per day" required>
+      <select id="mStatus" class="w-full border p-2 rounded">
+        <option value="AVAILABLE">Available</option>
+        <option value="RENTED">Rented</option>
+      </select>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeModal()" class="px-4 py-1 border rounded">Cancel</button>
+        <button class="px-4 py-1 bg-green-600 text-white rounded">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ---------------- STATE ---------------- */
+let machines = JSON.parse(localStorage.getItem('machines')) || [
+  { id: 1, name: "Excavator", price: 200, status: "AVAILABLE" },
+  { id: 2, name: "Bulldozer", price: 300, status: "RENTED" }
+];
+
+let adminCreds = JSON.parse(localStorage.getItem('adminCreds')) || {
+  username: "admin",
+  password: "admin"
+};
+
+let editingId = null;
+
+/* ---------------- VIEW SWITCHING ---------------- */
+const customerView = document.getElementById("customerView");
+const adminLogin = document.getElementById("adminLogin");
+const adminDashboard = document.getElementById("adminDashboard");
+
+document.getElementById("customerBtn").onclick = () => showView("customer");
+document.getElementById("adminBtn").onclick = () => showView("adminLogin");
+document.getElementById("logoutBtn").onclick = () => showView("customer");
+
+function showView(view) {
+  customerView.classList.add("hidden");
+  adminLogin.classList.add("hidden");
+  adminDashboard.classList.add("hidden");
+
+  if (view === "customer") customerView.classList.remove("hidden");
+  if (view === "adminLogin") adminLogin.classList.remove("hidden");
+  if (view === "adminDashboard") adminDashboard.classList.remove("hidden");
+}
+
+/* ---------------- RENDER CUSTOMER ---------------- */
+function renderCustomer() {
+  const grid = document.getElementById("machineGrid");
+  grid.innerHTML = "";
+
+  machines.forEach(m => {
+    grid.innerHTML += `
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-semibold">${m.name}</h3>
+        <p>$${m.price}/day</p>
+        <span class="text-sm ${m.status === 'AVAILABLE' ? 'text-green-600' : 'text-red-600'}">
+          ${m.status}
+        </span>
+        <button 
+          class="mt-3 w-full py-1 rounded ${m.status === 'AVAILABLE' ? 'bg-blue-600 text-white' : 'bg-gray-400'}"
+          ${m.status !== 'AVAILABLE' ? 'disabled' : ''}
+        >
+          Book Now
+        </button>
+      </div>
+    `;
+  });
+}
+
+/* ---------------- RENDER ADMIN ---------------- */
+function renderAdmin() {
+  const grid = document.getElementById("adminMachineGrid");
+  grid.innerHTML = "";
+
+  machines.forEach(m => {
+    grid.innerHTML += `
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="font-semibold">${m.name}</h3>
+        <p>$${m.price}/day</p>
+        <p>Status: ${m.status}</p>
+        <div class="flex gap-2 mt-2">
+          <button onclick="editMachine(${m.id})" class="bg-blue-600 text-white px-2 py-1 rounded">Edit</button>
+          <button onclick="deleteMachine(${m.id})" class="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/* ---------------- ADMIN AUTH ---------------- */
+document.getElementById("loginForm").onsubmit = e => {
+  e.preventDefault();
+  if (
+    username.value === adminCreds.username &&
+    password.value === adminCreds.password
+  ) {
+    showView("adminDashboard");
+    renderAdmin();
+  } else {
+    loginError.classList.remove("hidden");
+  }
+};
+
+/* ---------------- MODAL LOGIC ---------------- */
+document.getElementById("addMachineBtn").onclick = () => {
+  editingId = null;
+  machineForm.reset();
+  machineModal.classList.remove("hidden");
+};
+
+function editMachine(id) {
+  const m = machines.find(x => x.id === id);
+  editingId = id;
+  mName.value = m.name;
+  mPrice.value = m.price;
+  mStatus.value = m.status;
+  machineModal.classList.remove("hidden");
+}
+
+function deleteMachine(id) {
+  machines = machines.filter(m => m.id !== id);
+  save();
+}
+
+machineForm.onsubmit = e => {
+  e.preventDefault();
+  if (editingId) {
+    Object.assign(machines.find(m => m.id === editingId), {
+      name: mName.value,
+      price: +mPrice.value,
+      status: mStatus.value
+    });
+  } else {
+    machines.push({
+      id: Date.now(),
+      name: mName.value,
+      price: +mPrice.value,
+      status: mStatus.value
+    });
+  }
+  save();
+  closeModal();
+};
+
+function closeModal() {
+  machineModal.classList.add("hidden");
+}
+
+/* ---------------- SAVE & INIT ---------------- */
+function save() {
+  localStorage.setItem("machines", JSON.stringify(machines));
+  renderCustomer();
+  renderAdmin();
+}
+
+renderCustomer();
+showView("customer");
+</script>
+
+</body>
+</html>

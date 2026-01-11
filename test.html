@@ -1,0 +1,3843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machinery Rental</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          'heading': ['Exo 2', 'sans-serif'],
+          'body': ['Inter', 'sans-serif'],
+        },
+        colors: {
+          'industrial': {
+            'yellow': '#FFB347',
+            'orange': '#FF8C00',
+            'gray': '#2D3748',
+            'blue': '#4299E1',
+            'safety': '#FF6B35',
+            'green': '#10B981',
+          }
+        },
+        boxShadow: {
+          'card': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        },
+        animation: {
+          'fade-in': 'fadeIn 0.5s ease-in-out',
+          'slide-up': 'slideUp 0.3s ease-out',
+        },
+        keyframes: {
+          fadeIn: {
+            '0%': { opacity: '0' },
+            '100%': { opacity: '1' },
+          },
+          slideUp: {
+            '0%': { transform: 'translateY(10px)', opacity: '0' },
+            '100%': { transform: 'translateY(0)', opacity: '1' }
+          }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .hero-bg {
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(255, 179, 71, 0.2) 0%, transparent 20%),
+      radial-gradient(circle at 90% 80%, rgba(255, 140, 0, 0.15) 0%, transparent 20%);
+  }
+  
+  .safety-stripes {
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 107, 53, 0.05) 10px,
+      rgba(255, 107, 53, 0.05) 20px
+    );
+  }
+  
+  .gear-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'%3E%3C/path%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  
+  .payment-method {
+    transition: all 0.3s ease;
+  }
+  
+  .payment-method:hover {
+    transform: translateY(-2px);
+  }
+  
+  .payment-method.selected {
+    border-color: #FFB347;
+    background-color: rgba(255, 179, 71, 0.05);
+  }
+  
+  .delivery-option {
+    transition: all 0.3s ease;
+  }
+  
+  .delivery-option:hover {
+    transform: translateY(-2px);
+  }
+  
+  .delivery-option.selected {
+    border-color: #10B981;
+    background-color: rgba(16, 185, 129, 0.05);
+  }
+  
+  .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: 2px solid #E5E7EB;
+  }
+  
+  .step-number.active {
+    background-color: #FFB347;
+    color: white;
+    border-color: #FFB347;
+  }
+  
+  .step-number.completed {
+    background-color: #10B981;
+    color: white;
+    border-color: #10B981;
+  }
+  
+  .modal-overlay {
+    cursor: pointer;
+  }
+  
+  .modal-content {
+    cursor: auto;
+  }
+  
+  /* Admin specific styles */
+  .admin-badge {
+    @apply px-2 py-1 text-xs font-semibold rounded-full border transition-all duration-200;
+  }
+  
+  .loading-spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #FFB347;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @media (max-width: 768px) {
+    .mobile-stack {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .mobile-stack > * {
+      width: 100%;
+      margin-bottom: 0.75rem;
+    }
+    
+    .mobile-stack > *:last-child {
+      margin-bottom: 0;
+    }
+    
+    .mobile-text-center {
+      text-align: center;
+    }
+    
+    .mobile-full-width {
+      width: 100% !important;
+    }
+  }
+</style>
+</head>
+
+<body class="bg-gray-50 font-body safety-stripes">
+
+<!-- Admin Login Screen -->
+<div id="adminLoginScreen" class="hidden fixed inset-0 bg-industrial-gray flex flex-col justify-center items-center p-4 z-50">
+    <div class="bg-white p-8 sm:p-12 rounded-xl shadow-lg w-full max-w-md border border-gray-200 animate-fade-in">
+     
+        <h2 class="text-2xl font-heading font-bold text-center mb-6 text-industrial-gray">Admin Login</h2>
+        
+        <form id="adminLoginForm" onsubmit="adminLogin(event)" class="space-y-6">
+            <div>
+                <label for="adminUsername" class="block text-sm font-medium mb-2 flex items-center">
+                    <i class="fas fa-user text-industrial-blue mr-2"></i>
+                    Username
+                </label>
+                <input type="text" id="adminUsername" required 
+                    class="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all"
+                    placeholder="Enter admin username">
+            </div>
+
+            <div>
+                <label for="adminPassword" class="block text-sm font-medium mb-2 flex items-center">
+                    <i class="fas fa-lock text-industrial-blue mr-2"></i>
+                    Password
+                </label>
+                <input type="password" id="adminPassword" required 
+                    class="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all"
+                    placeholder="Enter password">
+            </div>
+            
+            <div id="adminLoginError" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span>Invalid username or password. Please try again.</span>
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-industrial-yellow text-white font-bold py-3 rounded-lg hover:bg-industrial-orange transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center group">
+                <i class="fas fa-sign-in-alt mr-2 transition-transform group-hover:translate-x-1"></i>
+                Log In to Dashboard
+            </button>
+        </form>
+        
+        <div class="mt-6 text-center">
+            <button onclick="hideAdminLogin()" class="text-industrial-gray hover:text-industrial-orange transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Main Site
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Dashboard -->
+<div id="adminPanel" class="hidden min-h-screen bg-gray-100">
+    <nav class="bg-industrial-gray text-white px-6 py-4 flex justify-between items-center shadow-lg border-b border-industrial-yellow/30">
+      <div class="flex items-center space-x-4">
+        <div class="bg-industrial-yellow p-2 rounded-lg">
+          <i class="fas fa-cogs text-industrial-gray text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-heading font-bold text-xl">Admin Dashboard</h1>
+          <p class="text-xs text-gray-300">Industrial Machinery Rental System</p>
+        </div>
+      </div>
+      <div class="space-x-4 flex items-center">
+        <div class="hidden md:flex items-center space-x-2 text-sm bg-gray-700 px-3 py-1 rounded-lg">
+          <i class="fas fa-user-shield"></i>
+          <span>Administrator</span>
+        </div>
+        <button onclick="adminLogout()" class="text-sm px-4 py-2 bg-industrial-safety rounded-lg hover:bg-red-700 transition-all flex items-center shadow-md">
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          Log Out
+        </button>
+        <button onclick="showMainSite()" class="text-sm px-4 py-2 bg-industrial-blue rounded-lg hover:bg-blue-700 transition-all flex items-center shadow-md">
+          <i class="fas fa-home mr-2"></i>
+          View Site
+        </button>
+      </div>
+    </nav>
+    
+    <main class="p-6">
+      <!-- Tab Navigation -->
+      <div class="flex border-b border-gray-300 mb-8 bg-white rounded-t-lg overflow-hidden shadow-card">
+        <button onclick="showAdminTab('dashboard')" id="admin-tab-dashboard" class="py-4 px-8 font-medium border-b-2 border-industrial-yellow bg-white text-industrial-gray transition-all flex items-center">
+          <i class="fas fa-tachometer-alt mr-2"></i>
+          Dashboard
+        </button>
+        <button onclick="showAdminTab('inventory')" id="admin-tab-inventory" class="py-4 px-8 font-medium border-b-2 border-transparent hover:border-industrial-yellow transition-all flex items-center">
+          <i class="fas fa-hard-hat mr-2"></i>
+          Machine Inventory
+        </button>
+        <button onclick="showAdminTab('orders')" id="admin-tab-orders" class="py-4 px-8 font-medium border-b-2 border-transparent hover:border-industrial-yellow transition-all flex items-center">
+          <i class="fas fa-clipboard-list mr-2"></i>
+          Order Management
+        </button>
+      </div>
+
+      <!-- Dashboard Tab -->
+      <div id="adminDashboard" class="tab-content">
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h2 class="text-3xl font-heading font-bold">System Overview</h2>
+            <p class="text-gray-600">Key metrics at a glance</p>
+          </div>
+          <button onclick="adminRefreshAllData()" class="px-4 py-2 bg-industrial-blue text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+            <i class="fas fa-sync-alt mr-2"></i>
+            Refresh
+          </button>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="bg-white p-6 rounded-xl shadow-card border-l-4 border-industrial-yellow animate-slide-up">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm text-gray-500 uppercase tracking-wider font-medium">Total Machines</p>
+                <p id="admin-total-machines" class="text-3xl font-heading font-bold mt-1">0</p>
+              </div>
+              <div class="bg-industrial-yellow/20 p-3 rounded-lg">
+                <i class="fas fa-hard-hat text-industrial-yellow text-xl"></i>
+              </div>
+            </div>
+            <div class="mt-4 text-sm">
+              <span id="admin-available-machines" class="text-industrial-green font-medium">0 available</span>
+              <span class="mx-2">•</span>
+              <span id="admin-rented-machines" class="text-industrial-yellow font-medium">0 rented</span>
+            </div>
+          </div>
+          
+          <div class="bg-white p-6 rounded-xl shadow-card border-l-4 border-industrial-blue animate-slide-up" style="animation-delay: 0.1s">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm text-gray-500 uppercase tracking-wider font-medium">Pending Orders</p>
+                <p id="admin-pending-orders" class="text-3xl font-heading font-bold mt-1">0</p>
+              </div>
+              <div class="bg-industrial-blue/20 p-3 rounded-lg">
+                <i class="fas fa-clock text-industrial-blue text-xl"></i>
+              </div>
+            </div>
+            <p class="text-sm text-gray-600 mt-4">Awaiting processing</p>
+          </div>
+          
+          <div class="bg-white p-6 rounded-xl shadow-card border-l-4 border-industrial-safety animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm text-gray-500 uppercase tracking-wider font-medium">Unverified Payments</p>
+                <p id="admin-unverified-payments" class="text-3xl font-heading font-bold mt-1">0</p>
+              </div>
+              <div class="bg-industrial-safety/20 p-3 rounded-lg">
+                <i class="fas fa-exclamation-triangle text-industrial-safety text-xl"></i>
+              </div>
+            </div>
+            <p class="text-sm text-industrial-safety mt-4">Requires attention</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Tab -->
+      <div id="adminInventory" class="tab-content hidden">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <div>
+            <h2 class="text-3xl font-heading font-bold">Machine Inventory</h2>
+            <p class="text-gray-600">Manage all machinery in the rental fleet</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 mt-4 md:mt-0">
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input type="text" id="adminInventorySearch" placeholder="Search machines..." 
+                class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow w-64"
+                onkeyup="adminFilterInventoryGrid()">
+            </div>
+            <select id="adminInventoryFilter" onchange="adminFilterInventoryGrid()" class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-industrial-yellow">
+              <option value="all">All Categories</option>
+              <option value="Earthmoving">Earthmoving</option>
+              <option value="Road Construction">Road Construction</option>
+              <option value="Material Handling">Material Handling</option>
+              <option value="Concrete">Concrete</option>
+              <option value="Other">Other</option>
+            </select>
+            <button onclick="openAdminMachineForm()" class="bg-industrial-yellow text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-industrial-orange transition-all flex items-center">
+              <i class="fas fa-plus mr-2"></i>
+              Add New Machine
+            </button>
+          </div>
+        </div>
+
+        <!-- Inventory Grid -->
+        <div id="adminInventoryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Will be populated by JavaScript -->
+          <div id="adminInventoryLoading" class="col-span-full text-center py-12">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-500">Loading inventory data...</p>
+          </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div id="adminInventoryEmpty" class="hidden text-center py-12">
+          <i class="fas fa-hard-hat text-gray-300 text-4xl mb-4"></i>
+          <h3 class="text-xl font-heading font-bold text-gray-500">No machines found</h3>
+          <p class="text-gray-400 mt-2">Add your first machine to get started</p>
+          <button onclick="openAdminMachineForm()" class="mt-4 bg-industrial-yellow text-white font-semibold py-2 px-4 rounded-lg hover:bg-industrial-orange transition-colors">
+            Add New Machine
+          </button>
+        </div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div id="adminOrders" class="tab-content hidden">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <div>
+            <h2 class="text-3xl font-heading font-bold">Order Management</h2>
+            <p class="text-gray-600">Manage customer orders and payments</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 mt-4 md:mt-0">
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input type="text" id="adminOrderSearch" placeholder="Search orders..." 
+                class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow w-64"
+                onkeyup="adminFilterOrderTable()">
+            </div>
+            <select id="adminOrderStatusFilter" onchange="adminFilterOrderTable()" class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-industrial-yellow">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="pending_payment">Awaiting Payment</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="bg-white rounded-xl shadow-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead class="bg-industrial-gray text-white">
+                <tr class="text-left text-sm font-heading font-semibold uppercase tracking-wider">
+                  <th class="p-4">Order ID</th>
+                  <th class="p-4">Date</th>
+                  <th class="p-4">Total</th>
+                  <th class="p-4">Payment</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4">Customer</th>
+                  <th class="p-4 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminOrderList" class="bg-white divide-y divide-gray-300">
+                <!-- Will be populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Empty State -->
+          <div id="adminOrdersEmpty" class="hidden p-8 text-center">
+            <i class="fas fa-clipboard-list text-gray-300 text-4xl mb-4"></i>
+            <h3 class="text-xl font-heading font-bold text-gray-500">No orders found</h3>
+            <p class="text-gray-400 mt-2">Orders will appear here when customers make rentals</p>
+          </div>
+          
+          <!-- Loading State -->
+          <div id="adminOrdersLoading" class="p-8 text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-500">Loading orders data...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Machine Form Modal -->
+    <div id="adminMachineFormModal" class="hidden fixed inset-0 bg-black/70 flex justify-center items-center p-4 z-50">
+      <div class="bg-white max-w-2xl w-full p-8 rounded-2xl relative max-h-[90vh] overflow-y-auto shadow-lg animate-slide-up">
+        <button onclick="closeAdminMachineForm()" class="absolute top-4 right-4 text-industrial-gray hover:text-industrial-orange text-xl transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+        <h3 id="adminMachineFormTitle" class="text-2xl font-heading font-bold mb-2">Add New Machine</h3>
+        <p class="text-gray-600 mb-6">Fill in the details for the new machinery</p>
+        
+        <form id="adminMachineForm" onsubmit="saveAdminMachine(event)" class="space-y-6">
+          <input type="hidden" id="adminMachineId">
+          
+          <!-- Validation Error Container -->
+          <div id="adminFormErrors" class="hidden bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+            <p class="font-medium"><i class="fas fa-exclamation-circle mr-2"></i>Please fix the following errors:</p>
+            <ul id="adminErrorList" class="mt-2 ml-6 list-disc text-sm"></ul>
+          </div>
+          
+          <!-- Form Fields Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block mb-2 font-medium text-industrial-gray">
+                <i class="fas fa-tag text-industrial-blue mr-2"></i>
+                Machine Name *
+              </label>
+              <input type="text" id="admin-m-name" required 
+                class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all"
+                placeholder="e.g., Excavator XYZ-500">
+              <p class="text-xs text-gray-500 mt-1">Enter the full machine model name</p>
+            </div>
+            
+            <div>
+              <label class="block mb-2 font-medium text-industrial-gray">
+                <i class="fas fa-folder text-industrial-blue mr-2"></i>
+                Category *
+              </label>
+              <select id="admin-m-category" required 
+                class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all">
+                <option value="">Select Category</option>
+                <option value="Earthmoving">Earthmoving</option>
+                <option value="Road Construction">Road Construction</option>
+                <option value="Material Handling">Material Handling</option>
+                <option value="Concrete">Concrete</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block mb-2 font-medium text-industrial-gray">
+                <i class="fas fa-dollar-sign text-industrial-blue mr-2"></i>
+                Price/Day ($) *
+              </label>
+              <input type="number" id="admin-m-price" required min="1" step="0.01"
+                class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all"
+                placeholder="e.g., 250.00">
+              <p class="text-xs text-gray-500 mt-1">Minimum $1 per day</p>
+            </div>
+            
+            <div>
+              <label class="block mb-2 font-medium text-industrial-gray">
+                <i class="fas fa-info-circle text-industrial-blue mr-2"></i>
+                Status *
+              </label>
+              <select id="admin-m-status" required
+                class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all">
+                <option value="Available">Available</option>
+                <option value="Rented">Rented</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+            </div>
+            
+            <div class="md:col-span-2">
+              <label class="block mb-2 font-medium text-industrial-gray">
+                <i class="fas fa-image text-industrial-blue mr-2"></i>
+                Image URL *
+              </label>
+              <input type="url" id="admin-m-image" required
+                class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all"
+                placeholder="https://example.com/machine-image.jpg">
+              <p class="text-xs text-gray-500 mt-1">Enter a direct link to a high-quality image</p>
+            </div>
+            
+            <div class="md:col-span-2">
+              <label class="block mb-2 font-medium text-industrial-gray">
+                <i class="fas fa-exclamation-triangle text-industrial-safety mr-2"></i>
+                Safety Notes
+              </label>
+              <textarea id="admin-m-safetyNotes" rows="3"
+                class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all"
+                placeholder="Important safety precautions and operational guidelines..."></textarea>
+              <p class="text-xs text-gray-500 mt-1">Optional safety information for operators</p>
+            </div>
+          </div>
+          
+          <!-- Image Preview -->
+          <div id="adminImagePreviewContainer" class="hidden">
+            <p class="font-medium mb-2">Image Preview:</p>
+            <div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+              <img id="adminImagePreview" src="" alt="Preview" class="max-h-40 mx-auto rounded">
+            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="flex justify-end space-x-4 pt-6 border-t border-gray-300">
+            <button type="button" onclick="closeAdminMachineForm()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" id="adminSaveMachineButton" class="px-6 py-3 bg-industrial-yellow text-white font-bold rounded-lg hover:bg-industrial-orange transition-colors shadow-md hover:shadow-lg flex items-center">
+              <i class="fas fa-save mr-2"></i>
+              Save Machine
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="adminOrderDetailsModal" class="hidden fixed inset-0 bg-black/70 flex justify-center items-center p-4 z-50">
+      <div class="bg-white max-w-3xl w-full p-8 rounded-2xl relative max-h-[90vh] overflow-y-auto shadow-lg animate-slide-up">
+        <button onclick="closeAdminOrderDetails()" class="absolute top-4 right-4 text-industrial-gray hover:text-industrial-orange text-xl transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+        <h3 class="text-2xl font-heading font-bold mb-2">Order Details</h3>
+        <p class="text-gray-600 mb-6">Order ID: <span id="adminOrderDetailId" class="font-bold"></span></p>
+        <div id="adminOrderDetailContent" class="space-y-6"></div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="adminNotificationToast" class="hidden fixed bottom-6 right-6 bg-industrial-gray text-white p-4 rounded-lg shadow-lg z-50 max-w-sm animate-slide-up">
+      <div class="flex items-start">
+        <i id="adminToastIcon" class="fas fa-check-circle text-industrial-green mt-0.5 mr-3 text-xl"></i>
+        <div>
+          <p id="adminToastTitle" class="font-bold"></p>
+          <p id="adminToastMessage" class="text-sm text-gray-300 mt-1"></p>
+        </div>
+        <button onclick="hideAdminToast()" class="ml-4 text-gray-400 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+</div>
+
+<!-- Main Site Content -->
+<section id="mainSiteContent" class="">
+  <nav class="bg-industrial-gray text-white px-4 md:px-8 py-4 flex justify-between items-center shadow-lg">
+  <div class="flex items-center space-x-3">
+    <div class="gear-icon bg-industrial-yellow p-2 rounded-lg"></div>
+    <h1 class="font-heading font-bold text-xl md:text-2xl tracking-tight">Machinery<span class="text-industrial-yellow">Hub</span></h1>
+  </div>
+  <div class="flex items-center space-x-4 md:space-x-6">
+    <!-- My Orders Button (Icon only) -->
+    <button onclick="openOrders()" class="relative p-2 hover:bg-industrial-gray/80 rounded-lg transition-colors duration-200">
+      <span class="text-2xl">📋</span>
+      <span id="ordersBadge" class="absolute -top-1 -right-1 bg-industrial-green text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+    </button>
+    
+    <!-- Wishlist Button (Icon only) -->
+    <button onclick="openWishlist()" class="relative p-2 hover:bg-industrial-gray/80 rounded-lg transition-colors duration-200">
+      <span class="text-2xl">💛</span>
+      <span id="wishlistBadge" class="absolute -top-1 -right-1 bg-industrial-blue text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+    </button>
+    
+    <!-- Cart Button (Icon only) -->
+    <button onclick="openCart()" class="relative p-2 hover:bg-industrial-gray/80 rounded-lg transition-colors duration-200">
+      <span class="text-2xl">🛒</span>
+      <span id="cartBadge" class="absolute -top-1 -right-1 bg-industrial-yellow text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+    </button>
+    
+    <!-- Admin Dashboard Button -->
+    <button onclick="showAdminLogin()" class="text-sm md:text-base hover:text-industrial-yellow transition-colors duration-200 p-2">
+      👤
+    </button>
+  </div>
+</nav>
+<section class="hero-bg bg-gradient-to-r from-industrial-yellow to-industrial-orange py-16 md:py-20 text-center relative overflow-hidden">
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute top-10 left-10 text-6xl">⚙️</div>
+    <div class="absolute bottom-10 right-10 text-6xl">🏗️</div>
+  </div>
+  <div class="relative max-w-4xl mx-auto px-4">
+    <h2 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 text-white drop-shadow-lg">
+      Heavy Machines.<br class="md:hidden"> Simple Rentals.
+    </h2>
+    <p class="text-xl md:text-2xl text-white/90 mb-8 md:mb-10">Choose dates, quantity, and book instantly</p>
+    <div class="inline-flex items-center bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
+      <span class="text-white font-semibold">✅ 24/7 Support</span>
+      <span class="mx-4 text-white/60">|</span>
+      <span class="text-white font-semibold">🔧 Free Delivery</span>
+      <span class="mx-4 text-white/60">|</span>
+      <span class="text-white font-semibold">⭐ Certified Equipment</span>
+    </div>
+  </div>
+</section>
+
+<section class="p-4 md:p-8 max-w-7xl mx-auto">
+  <div class="mb-8">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="font-heading text-2xl md:text-3xl font-bold text-industrial-gray">Available Machinery</h2>
+        <p class="text-gray-600 mt-1">Browse our premium equipment fleet</p>
+      </div>
+      <div class="text-right">
+        <p id="searchResultsCount" class="text-sm text-gray-600">Showing all equipment</p>
+      </div>
+    </div>
+    
+    <!-- Search and Filter Controls (Removed Status Filter) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <!-- Search Bar -->
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <input 
+          type="text" 
+          id="searchInput"
+          oninput="performSearch()"
+          placeholder="Search machinery by name, category, or specs..."
+          class="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200"
+        >
+      </div>
+      
+      <!-- Category Filter Only -->
+      <div class="flex items-center space-x-3">
+        <label for="categoryFilter" class="font-medium text-gray-700 whitespace-nowrap">Category:</label>
+        <select id="categoryFilter" onchange="filterByCategory(this.value)" class="w-full border-2 border-gray-200 p-3 rounded-xl bg-white focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200">
+          <!-- Options will be populated by JS -->
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  <div id="machineGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"></div>
+
+  <div id="paginationControls" class="flex flex-col sm:flex-row justify-between items-center mt-10 md:mt-12 space-y-4 sm:space-y-0">
+    <div class="text-gray-600 text-sm md:text-base mobile-text-center">
+      Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> machines
+    </div>
+    <div class="flex items-center space-x-3">
+      <button onclick="changePage(-1)" id="prevBtn" class="bg-gray-200 hover:bg-gray-300 px-5 py-2.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium">
+        &larr; Previous
+      </button>
+      <span id="pageStatus" class="text-gray-700 font-medium px-4 py-2 bg-gray-100 rounded-lg">Page 1 of 1</span>
+      <button onclick="changePage(1)" id="nextBtn" class="bg-gray-200 hover:bg-gray-300 px-5 py-2.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center font-medium">
+        Next &rarr;
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Trust Indicators Section -->
+<section class="bg-white py-12 md:py-16 px-4 md:px-8 mt-8 md:mt-12 shadow-inner">
+  <div class="max-w-6xl mx-auto">
+    <h3 class="font-heading text-2xl md:text-3xl font-bold text-center mb-10 md:mb-12 text-industrial-gray">Why Choose MachineryHub?</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
+      <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white shadow-card hover:shadow-card-hover transition-all duration-300">
+        <div class="text-4xl mb-4">🛡️</div>
+        <h4 class="font-heading font-bold text-lg mb-2">Full Insurance</h4>
+        <p class="text-gray-600 text-sm">Every rental includes comprehensive insurance coverage</p>
+      </div>
+      <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white shadow-card hover:shadow-card-hover transition-all duration-300">
+        <div class="text-4xl mb-4">🚚</div>
+        <h4 class="font-heading font-bold text-lg mb-2">Free Delivery</h4>
+        <p class="text-gray-600 text-sm">On-site delivery within 50 miles at no extra cost</p>
+      </div>
+      <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white shadow-card hover:shadow-card-hover transition-all duration-300">
+        <div class="text-4xl mb-4">🔧</div>
+        <h4 class="font-heading font-bold text-lg mb-2">Certified Maintenance</h4>
+        <p class="text-gray-600 text-sm">All equipment regularly serviced by certified technicians</p>
+      </div>
+      <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white shadow-card hover:shadow-card-hover transition-all duration-300">
+        <div class="text-4xl mb-4">⭐</div>
+        <h4 class="font-heading font-bold text-lg mb-2">4.8/5 Rating</h4>
+        <p class="text-gray-600 text-sm">Rated excellent by 500+ construction companies</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modals -->
+<div id="detailModal" class="hidden fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 modal-overlay" onclick="closeModalOnOutsideClick(event, 'detailModal')">
+  <div class="bg-white max-w-2xl w-full p-6 rounded-2xl relative max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in modal-content" onclick="event.stopPropagation()">
+    <button onclick="closeDetail()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<div id="cartModal" class="hidden fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 modal-overlay" onclick="closeModalOnOutsideClick(event, 'cartModal')">
+  <div class="bg-white max-w-xl w-full p-6 md:p-8 rounded-2xl relative shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto modal-content" onclick="event.stopPropagation()">
+    <button onclick="closeCart()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <h2 class="font-heading text-2xl md:text-3xl font-bold mb-6 text-industrial-gray">Your Cart</h2>
+    <div id="cartItems"></div>
+    <div class="flex justify-between items-center mt-8 pt-6 border-t-2 border-gray-100">
+      <span class="font-heading font-bold text-xl">Total</span>
+      <span id="cartTotal" class="font-heading font-bold text-2xl text-industrial-yellow">$0</span>
+    </div>
+    <button onclick="openCompleteBookingModal()" class="mt-8 w-full bg-gradient-to-r from-industrial-yellow to-industrial-orange hover:from-orange-500 hover:to-red-500 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl">
+      Proceed to Checkout
+    </button>
+  </div>
+</div>
+
+<!-- Complete Booking Modal -->
+<div id="completeBookingModal" class="hidden fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 modal-overlay" onclick="closeModalOnOutsideClick(event, 'completeBookingModal')">
+  <div class="bg-white max-w-4xl w-full rounded-2xl relative shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto modal-content" onclick="event.stopPropagation()">
+    <button onclick="closeCompleteBookingModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl z-10">&times;</button>
+    <div class="p-6 md:p-8">
+      <h2 class="font-heading text-2xl md:text-3xl font-bold mb-8 text-industrial-gray">Complete Your Booking</h2>
+      
+      <!-- Progress Steps with Numbers Only (No Color Change) -->
+      <div class="flex items-center justify-between mb-10 relative">
+        <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2 z-0"></div>
+        <div class="absolute top-1/2 left-0 h-1 bg-industrial-yellow -translate-y-1/2 z-0" id="progressBar" style="width: 25%"></div>
+        
+        <div class="flex flex-col items-center relative z-10">
+          <div class="step-number ${currentStep >= 1 ? 'active' : ''}">1</div>
+        </div>
+        
+        <div class="flex flex-col items-center relative z-10">
+          <div class="step-number ${currentStep >= 2 ? 'active' : ''}">2</div>
+        </div>
+        
+        <div class="flex flex-col items-center relative z-10">
+          <div class="step-number ${currentStep >= 3 ? 'active' : ''}">3</div>
+        </div>
+        
+        <div class="flex flex-col items-center relative z-10">
+          <div class="step-number ${currentStep >= 4 ? 'active' : ''}">4</div>
+        </div>
+      </div>
+      
+      <!-- Step 1: Contact Information (Updated with Email) -->
+      <div id="step1" class="space-y-6">
+        <h3 class="font-heading text-xl font-bold text-industrial-gray mb-6">Contact Information</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block font-medium text-gray-700 mb-2">Full Name *</label>
+            <input type="text" id="bookingName" placeholder="John Smith" 
+              class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200">
+          </div>
+          
+          <div>
+            <label class="block font-medium text-gray-700 mb-2">Email Address *</label>
+            <input type="email" id="bookingEmail" placeholder="john@example.com" 
+              class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200">
+          </div>
+          
+          <div>
+            <label class="block font-medium text-gray-700 mb-2">Phone Number *</label>
+            <input type="tel" id="bookingPhone" placeholder="(555) 123-4567" 
+              class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200">
+          </div>
+          
+          <div>
+            <label class="block font-medium text-gray-700 mb-2">Company Name (Optional)</label>
+            <input type="text" id="bookingCompany" placeholder="ABC Construction Inc." 
+              class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200">
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <label class="block font-medium text-gray-700 mb-2">Address (Required for delivery)</label>
+          <textarea id="bookingAddress" rows="3" placeholder="123 Main Street, Apt 4B, City, State, ZIP" 
+            class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200"></textarea>
+          <p class="text-sm text-gray-500 mt-2">Required if selecting delivery. Optional for pickup.</p>
+        </div>
+        
+        <div class="flex justify-end mt-8">
+          <button onclick="nextStep(2)" class="bg-industrial-yellow hover:bg-orange-500 text-white px-8 py-3 rounded-xl font-bold transition-colors duration-200">
+            Next: Delivery Options
+          </button>
+        </div>
+      </div>
+      
+      <!-- Step 2: Delivery Options -->
+      <div id="step2" class="space-y-6 hidden">
+        <h3 class="font-heading text-xl font-bold text-industrial-gray mb-6">Delivery Options</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="delivery-option border-2 border-gray-200 p-6 rounded-2xl cursor-pointer" 
+               onclick="selectDeliveryOption('pickup', this)">
+            <div class="flex items-start space-x-4">
+              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <span class="text-2xl">🚗</span>
+              </div>
+              <div>
+                <h4 class="font-heading font-bold text-lg mb-2">Pickup at Our Location</h4>
+                <p class="text-gray-600">Pick up equipment from our warehouse at:</p>
+                <p class="text-sm text-gray-700 mt-2 font-medium">789 Industrial Way, City, State 12345</p>
+                <p class="text-sm text-gray-500 mt-1">Hours: Mon-Fri 7AM-6PM, Sat 8AM-4PM</p>
+                <p class="text-green-600 font-bold mt-2">FREE</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="delivery-option border-2 border-gray-200 p-6 rounded-2xl cursor-pointer" 
+               onclick="selectDeliveryOption('delivery', this)">
+            <div class="flex items-start space-x-4">
+              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <span class="text-2xl">🚚</span>
+              </div>
+              <div>
+                <h4 class="font-heading font-bold text-lg mb-2">Delivery to Site</h4>
+                <p class="text-gray-600">We'll deliver and pick up from your location</p>
+                <p class="text-sm text-gray-700 mt-2 font-medium">Within 50 miles: FREE</p>
+                <p class="text-sm text-gray-500 mt-1">Beyond 50 miles: $2.50 per mile</p>
+                <p class="text-green-600 font-bold mt-2">FREE (within 50 miles)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="deliveryDetails" class="hidden mt-6">
+          <h4 class="font-heading font-bold text-lg mb-4">Delivery Details</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium text-gray-700 mb-2">Preferred Delivery Date *</label>
+              <input type="date" id="deliveryDate" class="w-full border-2 border-gray-200 p-3 rounded-xl">
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-2">Delivery Time Window *</label>
+              <select id="deliveryTime" class="w-full border-2 border-gray-200 p-3 rounded-xl">
+                <option value="">Select a time</option>
+                <option value="morning">Morning (7AM-11AM)</option>
+                <option value="afternoon">Afternoon (11AM-3PM)</option>
+                <option value="evening">Evening (3PM-6PM)</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="block font-medium text-gray-700 mb-2">Special Instructions</label>
+            <textarea id="deliveryInstructions" rows="2" placeholder="Gate code, special access requirements, etc." 
+              class="w-full border-2 border-gray-200 p-3 rounded-xl"></textarea>
+          </div>
+        </div>
+        
+        <div class="flex justify-between mt-8">
+          <button onclick="prevStep(1)" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+            ← Back
+          </button>
+          <button onclick="nextStep(3)" class="bg-industrial-yellow hover:bg-orange-500 text-white px-8 py-3 rounded-xl font-bold transition-colors duration-200">
+            Next: Payment Method
+          </button>
+        </div>
+      </div>
+      
+      <!-- Step 3: Payment Method -->
+      <div id="step3" class="space-y-6 hidden">
+        <h3 class="font-heading text-xl font-bold text-industrial-gray mb-6">Payment Method</h3>
+        
+        <div class="space-y-4">
+          <div class="payment-method border-2 border-gray-200 p-6 rounded-2xl cursor-pointer" 
+               onclick="selectPaymentMethod('cash', this)">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <span class="text-2xl">💵</span>
+                </div>
+                <div>
+                  <h4 class="font-heading font-bold text-lg mb-1">Cash on Delivery/Acceptance</h4>
+                  <p class="text-gray-600">Pay when equipment is delivered or picked up</p>
+                </div>
+              </div>
+              <div class="text-green-600 font-bold">Pay Later</div>
+            </div>
+          </div>
+          
+          <div class="payment-method border-2 border-gray-200 p-6 rounded-2xl cursor-pointer" 
+               onclick="selectPaymentMethod('bank', this)">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <span class="text-2xl">🏦</span>
+                </div>
+                <div>
+                  <h4 class="font-heading font-bold text-lg mb-1">Bank Transfer</h4>
+                  <p class="text-gray-600">Transfer funds to our account. Booking confirmed after payment verification.</p>
+                  <div class="mt-2 text-sm bg-blue-50 p-3 rounded-lg">
+                    <p class="font-medium">Account Details:</p>
+                    <p>Bank: First National Bank</p>
+                    <p>Account: 1234567890</p>
+                    <p>Routing: 021000021</p>
+                    <p class="text-red-600 mt-1">Please include Order ID as reference</p>
+                  </div>
+                </div>
+              </div>
+              <div class="text-blue-600 font-bold">Pay Now</div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="bankTransferInfo" class="hidden mt-6 bg-blue-50 p-6 rounded-2xl border border-blue-200">
+          <h4 class="font-heading font-bold text-lg mb-3 text-blue-800">Important Instructions for Bank Transfer</h4>
+          <ol class="list-decimal pl-5 space-y-2 text-blue-700">
+            <li>Use the Order ID shown on confirmation as payment reference</li>
+            <li>Send payment to account details shown above</li>
+            <li>Your booking will be confirmed within 24 hours after payment verification</li>
+            <li>Contact support@machineryhub.com for assistance</li>
+          </ol>
+        </div>
+        
+        <div class="flex justify-between mt-8">
+          <button onclick="prevStep(2)" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+            ← Back
+          </button>
+          <button onclick="nextStep(4)" class="bg-industrial-yellow hover:bg-orange-500 text-white px-8 py-3 rounded-xl font-bold transition-colors duration-200">
+            Next: Review & Confirm
+          </button>
+        </div>
+      </div>
+      
+      <!-- Step 4: Review & Confirm -->
+      <div id="step4" class="space-y-6 hidden">
+        <h3 class="font-heading text-xl font-bold text-industrial-gray mb-6">Review Your Booking</h3>
+        
+        <div class="bg-gray-50 p-6 rounded-2xl">
+          <h4 class="font-heading font-bold text-lg mb-4">Order Summary</h4>
+          <div id="orderSummary"></div>
+          <div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-300">
+            <span class="font-heading font-bold text-xl">Total Amount</span>
+            <span id="orderTotal" class="font-heading font-bold text-2xl text-industrial-yellow">$0</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 p-6 rounded-2xl">
+          <h4 class="font-heading font-bold text-lg mb-4">Customer Information</h4>
+          <div id="customerInfo"></div>
+        </div>
+        
+        <div class="bg-gray-50 p-6 rounded-2xl">
+          <h4 class="font-heading font-bold text-lg mb-4">Delivery & Payment</h4>
+          <div id="deliveryPaymentInfo"></div>
+        </div>
+        
+        <div class="flex items-start mt-6">
+          <input type="checkbox" id="termsAgreement" class="mt-1 mr-3">
+          <label for="termsAgreement" class="text-gray-700">
+            I agree to the <a href="#" class="text-industrial-blue underline">Terms and Conditions</a> and understand that equipment must be returned in the same condition. I am responsible for any damages beyond normal wear and tear.
+          </label>
+        </div>
+        
+        <div class="flex justify-between mt-8">
+          <button onclick="prevStep(3)" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+            ← Back
+          </button>
+          <button onclick="submitBooking()" class="bg-industrial-green hover:bg-green-600 text-white px-8 py-3 rounded-xl font-bold transition-colors duration-200 flex items-center">
+            <span id="submitButtonText">Confirm & Place Order</span>
+            <span id="loadingSpinner" class="hidden ml-2">⏳</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Orders Modal -->
+<div id="ordersModal" class="hidden fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 modal-overlay" onclick="closeModalOnOutsideClick(event, 'ordersModal')">
+  <div class="bg-white max-w-4xl w-full rounded-2xl relative shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto modal-content" onclick="event.stopPropagation()">
+    <button onclick="closeOrders()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl z-10">&times;</button>
+    <div class="p-6 md:p-8">
+      <h2 class="font-heading text-2xl md:text-3xl font-bold mb-6 text-industrial-gray">My Orders</h2>
+      
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button onclick="filterOrders('all')" class="px-4 py-2 rounded-xl bg-industrial-gray text-white font-medium">All</button>
+        <button onclick="filterOrders('pending')" class="px-4 py-2 rounded-xl bg-yellow-500 text-white font-medium">Pending</button>
+        <button onclick="filterOrders('confirmed')" class="px-4 py-2 rounded-xl bg-blue-500 text-white font-medium">Confirmed</button>
+        <button onclick="filterOrders('completed')" class="px-4 py-2 rounded-xl bg-green-500 text-white font-medium">Completed</button>
+        <button onclick="filterOrders('cancelled')" class="px-4 py-2 rounded-xl bg-red-500 text-white font-medium">Cancelled</button>
+      </div>
+      
+      <div id="ordersList" class="space-y-6">
+        <!-- Orders will be loaded here -->
+      </div>
+      
+      <div id="noOrders" class="text-center py-12 hidden">
+        <div class="text-6xl mb-4">📋</div>
+        <h3 class="font-heading text-xl font-bold text-gray-700 mb-2">No Orders Yet</h3>
+        <p class="text-gray-500">Your orders will appear here once you make a booking</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="hidden fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 modal-overlay" onclick="closeModalOnOutsideClick(event, 'confirmModal')">
+  <div class="bg-white p-8 rounded-2xl max-w-md text-center shadow-2xl animate-fade-in modal-content" onclick="event.stopPropagation()">
+    <div class="text-6xl mb-6" id="confirmIcon">🎉</div>
+    <h2 class="font-heading text-2xl md:text-3xl font-bold mb-4 text-industrial-gray" id="confirmTitle">Booking Confirmed!</h2>
+    <p class="mb-4 text-gray-600" id="confirmMessage">Your rental has been successfully booked. A confirmation email has been sent.</p>
+    <p class="mb-6 font-mono bg-gray-100 p-3 rounded-lg" id="orderIdDisplay"></p>
+    <button onclick="closeConfirm()" class="bg-industrial-yellow hover:bg-orange-500 px-8 py-3 rounded-xl font-bold text-white transition-colors duration-200">
+      Done
+    </button>
+  </div>
+</div>
+
+<div id="wishlistModal" class="hidden fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 modal-overlay" onclick="closeModalOnOutsideClick(event, 'wishlistModal')">
+  <div class="bg-white max-w-xl w-full p-6 md:p-8 rounded-2xl relative shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto modal-content" onclick="event.stopPropagation()">
+    <button onclick="closeWishlist()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <h2 class="font-heading text-2xl md:text-3xl font-bold mb-6 text-industrial-gray">Your Wishlist</h2>
+    <p class="mb-6 text-sm md:text-base text-gray-600 bg-yellow-50 p-4 rounded-xl border border-yellow-100">These items are currently unavailable but you'll be notified when they are back in stock.</p>
+    <div id="wishlistItems"></div>
+  </div>
+</div>
+</section>
+
+<footer class="bg-industrial-gray text-white py-8 md:py-12 px-4 md:px-8 mt-12 md:mt-16">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+      <div>
+        <div class="flex items-center space-x-3 mb-4">
+          <div class="gear-icon bg-industrial-yellow p-2 rounded-lg"></div>
+          <h3 class="font-heading font-bold text-xl">Machinery<span class="text-industrial-yellow">Hub</span></h3>
+        </div>
+        <p class="text-gray-400 text-sm">Premium equipment rentals for construction and industrial needs.</p>
+      </div>
+      <div>
+        <h4 class="font-heading font-bold mb-4">Contact</h4>
+        <p class="text-gray-400 text-sm">📞 (555) 123-4567</p>
+        <p class="text-gray-400 text-sm">✉️ support@machineryhub.com</p>
+      </div>
+      <div>
+        <h4 class="font-heading font-bold mb-4">Hours</h4>
+        <p class="text-gray-400 text-sm">24/7 Online Booking</p>
+        <p class="text-gray-400 text-sm">Support: 6AM-10PM EST</p>
+      </div>
+      <div>
+        <h4 class="font-heading font-bold mb-4">Safety First</h4>
+        <p class="text-gray-400 text-sm">All equipment meets OSHA standards. Certified operators available.</p>
+      </div>
+    </div>
+    <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
+      © 2024 MachineryHub. All rights reserved. | <span class="text-industrial-yellow">🔒 Secure Booking</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ==================== ADMIN FUNCTIONS ==================== */
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'pass123';
+const STORAGE_KEY_ADMIN_LOGGED_IN = 'adminLoggedIn';
+
+// Admin Authentication
+function showAdminLogin() {
+  document.getElementById('adminLoginScreen').classList.remove('hidden');
+}
+
+function hideAdminLogin() {
+  document.getElementById('adminLoginScreen').classList.add('hidden');
+}
+
+function adminLogin(event) {
+  console.log('adminLogin function called'); // Debug
+  
+  event.preventDefault();
+  event.stopPropagation();
+  
+  console.log('Form submission prevented'); // Debug
+  
+  const username = document.getElementById('adminUsername').value;
+  const password = document.getElementById('adminPassword').value;
+  
+  console.log('Username:', username, 'Password:', password); // Debug
+  
+  // Hard code check without setTimeout
+  if (username === 'admin' && password === 'pass123') {
+    console.log('Login successful'); // Debug
+    localStorage.setItem('adminLoggedIn', 'true');
+    document.getElementById('adminLoginError').classList.add('hidden');
+    
+    // Hide login, show dashboard
+    document.getElementById('adminLoginScreen').classList.add('hidden');
+    document.getElementById('mainSiteContent').classList.add('hidden');
+    document.getElementById('adminPanel').classList.remove('hidden');
+    
+    // Show dashboard tab
+    showAdminTab('dashboard');
+  } else {
+    console.log('Login failed'); // Debug
+    document.getElementById('adminLoginError').classList.remove('hidden');
+  }
+  
+  return false;
+}
+
+function adminLogout() {
+  localStorage.removeItem(STORAGE_KEY_ADMIN_LOGGED_IN);
+  hideAdminDashboard();
+  adminShowNotification('Logged Out', 'You have been successfully logged out', 'info');
+}
+
+function checkAdminAuthentication() {
+  const isLoggedIn = localStorage.getItem(STORAGE_KEY_ADMIN_LOGGED_IN) === 'true';
+  if (isLoggedIn) {
+    showAdminDashboard();
+  }
+}
+
+function showAdminDashboard() {
+  document.getElementById('mainSiteContent').classList.add('hidden');
+  document.getElementById('adminPanel').classList.remove('hidden');
+  showAdminTab('dashboard');
+}
+
+function hideAdminDashboard() {
+  document.getElementById('mainSiteContent').classList.remove('hidden');
+  document.getElementById('adminPanel').classList.add('hidden');
+  hideAdminLogin();
+}
+
+function showMainSite() {
+  hideAdminDashboard();
+}
+
+// Admin Notification System
+function adminShowNotification(title, message, type = 'success') {
+  const toast = document.getElementById('adminNotificationToast');
+  const icon = document.getElementById('adminToastIcon');
+  const toastTitle = document.getElementById('adminToastTitle');
+  const toastMessage = document.getElementById('adminToastMessage');
+  
+  // Set icon based on type
+  const icons = {
+    success: 'fa-check-circle',
+    error: 'fa-exclamation-circle',
+    warning: 'fa-exclamation-triangle',
+    info: 'fa-info-circle'
+  };
+  
+  const colors = {
+    success: 'industrial-green',
+    error: 'industrial-safety',
+    warning: 'industrial-yellow',
+    info: 'industrial-blue'
+  };
+  
+  icon.className = `fas ${icons[type]} text-${colors[type]} mt-0.5 mr-3 text-xl`;
+  toastTitle.textContent = title;
+  toastMessage.textContent = message;
+  
+  toast.classList.remove('hidden');
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    if (!toast.classList.contains('hidden')) {
+      hideAdminToast();
+    }
+  }, 5000);
+}
+
+function hideAdminToast() {
+  document.getElementById('adminNotificationToast').classList.add('hidden');
+}
+
+// Admin Tab Management
+let adminCurrentTab = 'dashboard';
+
+function showAdminTab(tabName) {
+  console.log(`showAdminTab called for: ${tabName}`);
+  
+  // First hide all tab contents
+  const tabContents = document.querySelectorAll('#adminPanel .tab-content');
+  if (tabContents.length === 0) {
+    console.error('No tab contents found!');
+    return;
+  }
+  
+  tabContents.forEach(el => {
+    el.classList.add('hidden');
+  });
+  
+  // Deactivate all tab buttons
+  const tabButtons = document.querySelectorAll('#adminPanel [id^="admin-tab-"]');
+  tabButtons.forEach(btn => {
+    btn.classList.remove('border-industrial-yellow', 'bg-white', 'text-industrial-gray');
+    btn.classList.add('border-transparent');
+  });
+
+  // Show the selected tab content
+  const tabContentId = 'admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+  const tabContent = document.getElementById(tabContentId);
+  
+  if (tabContent) {
+    tabContent.classList.remove('hidden');
+    console.log(`Tab content ${tabContentId} shown`);
+  } else {
+    console.error(`Tab content not found: ${tabContentId}`);
+  }
+  
+  // Activate the selected tab button
+  const activeBtn = document.getElementById(`admin-tab-${tabName}`);
+  if (activeBtn) {
+    activeBtn.classList.add('border-industrial-yellow', 'bg-white', 'text-industrial-gray');
+    activeBtn.classList.remove('border-transparent');
+  } else {
+    console.error(`Tab button not found: admin-tab-${tabName}`);
+  }
+  
+  adminCurrentTab = tabName;
+
+  // Refresh content for the active tab
+  try {
+    console.log(`Refreshing tab: ${tabName}`);
+    if (tabName === 'inventory') {
+      adminRenderInventory(); // Make sure this is called
+    } else if (tabName === 'orders') {
+      adminRenderOrders();
+    } else if (tabName === 'dashboard') {
+      adminRenderDashboard();
+    }
+  } catch (error) {
+    console.error('Error refreshing admin tab:', error);
+  }
+}
+
+// Admin Dashboard Functions
+function adminRenderDashboard() {
+  console.log('adminRenderDashboard called'); // Debug log
+  
+  try {
+    const machines = JSON.parse(localStorage.getItem("machines")) || [];
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    
+    console.log('Machines found:', machines.length);
+    console.log('Orders found:', orders.length);
+    
+    // Calculate stats
+    const totalMachines = machines.length;
+    const availableMachines = machines.filter(m => m.status === 'Available').length;
+    const rentedMachines = machines.filter(m => m.status === 'Rented').length;
+    const pendingOrders = orders.filter(o => 
+      o.status === 'pending' || o.status === 'pending_payment' || o.status === 'pending_verification'
+    ).length;
+    
+    const unverifiedPayments = orders.filter(o => 
+      o.paymentStatus === 'pending_verification' || o.paymentMethod === 'bank' && o.paymentStatus !== 'paid'
+    ).length;
+    
+    console.log('Dashboard stats:', {
+      totalMachines,
+      availableMachines,
+      rentedMachines,
+      pendingOrders,
+      unverifiedPayments
+    });
+    
+    // Update dashboard elements - with null checks
+    const updateElement = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
+      } else {
+        console.warn(`Element with ID "${id}" not found`);
+      }
+    };
+    
+    // Update all stats
+    updateElement('admin-total-machines', totalMachines);
+    updateElement('admin-available-machines', `${availableMachines} available`);
+    updateElement('admin-rented-machines', `${rentedMachines} rented`);
+    updateElement('admin-pending-orders', pendingOrders);
+    updateElement('admin-unverified-payments', unverifiedPayments);
+    
+    // Also update any other dashboard elements if they exist
+    const dashboardContent = document.getElementById('adminDashboard');
+    if (dashboardContent) {
+      console.log('Dashboard content found and updated');
+    }
+    
+  } catch (error) {
+    console.error('Error in adminRenderDashboard:', error);
+    
+    // Show error in dashboard
+    const dashboardContent = document.getElementById('adminDashboard');
+    if (dashboardContent) {
+      dashboardContent.innerHTML += `
+        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mt-4">
+          <p class="font-medium"><i class="fas fa-exclamation-circle mr-2"></i>Error loading dashboard data</p>
+          <p class="text-sm mt-1">${error.message}</p>
+        </div>
+      `;
+    }
+  }
+}
+
+function adminRefreshAllData() {
+  adminShowNotification('Refreshing Data', 'Updating dashboard with latest information...', 'info');
+  adminRenderDashboard();
+  if (adminCurrentTab === 'inventory') adminRenderInventory();
+  if (adminCurrentTab === 'orders') adminRenderOrders();
+  
+  // Show success message after a short delay
+  setTimeout(() => {
+    adminShowNotification('Data Refreshed', 'All data has been updated successfully', 'success');
+  }, 800);
+}
+
+// Status color mapping
+function getAdminStatusColor(status) {
+  switch (status) {
+    case 'Available':
+    case 'Verified':
+    case 'verified':
+    case 'completed':
+    case 'confirmed':
+    case 'paid':
+      return 'industrial-green';
+    case 'Rented':
+    case 'pending':
+    case 'Unverified':
+    case 'pending_payment':
+    case 'pending_verification':
+      return 'industrial-yellow';
+    case 'Maintenance':
+    case 'cancelled':
+      return 'industrial-safety';
+    case 'Processing':
+      return 'industrial-blue';
+    default:
+      return 'industrial-gray';
+  }
+}
+
+// Admin Inventory Management
+function adminRenderInventory() {
+  // 1. Read machines from storage
+  const machines = JSON.parse(localStorage.getItem("machines")) || [];
+
+  // 2. Get DOM references
+  const grid = document.getElementById("adminInventoryGrid");
+  const emptyState = document.getElementById("adminInventoryEmpty");
+
+  if (!grid) {
+    console.error("adminInventoryGrid not found");
+    return;
+  }
+
+  // 3. Reset inventory view
+  grid.innerHTML = "";
+  emptyState.classList.add("hidden");
+
+  // 4. Handle empty inventory
+  if (machines.length === 0) {
+    emptyState.classList.remove("hidden");
+    return;
+  }
+
+  // 5. Render machines
+  machines.forEach(machine => {
+    const card = document.createElement("div");
+    card.className =
+      "bg-white rounded-xl shadow-card p-5 border border-gray-200 " +
+      "hover:shadow-card-hover transition-all duration-200";
+
+    card.innerHTML = `
+      <img
+        src="${machine.image}"
+        alt="${machine.name}"
+        class="h-40 w-full object-cover rounded-lg mb-4"
+      />
+
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="font-heading font-bold text-lg text-industrial-gray">
+            ${machine.name}
+          </h3>
+          <p class="text-sm text-gray-500">
+            ${machine.category}
+          </p>
+        </div>
+
+        <span class="px-3 py-1 text-xs font-semibold rounded-full border
+          ${machine.status === "Available"
+            ? "text-green-700 border-green-300 bg-green-50"
+            : machine.status === "Rented"
+            ? "text-yellow-700 border-yellow-300 bg-yellow-50"
+            : "text-red-700 border-red-300 bg-red-50"}">
+          ${machine.status}
+        </span>
+      </div>
+
+      <p class="mt-3 text-lg font-bold text-industrial-yellow">
+        $${machine.price} / day
+      </p>
+
+      <div class="flex justify-between items-center mt-5">
+        <button
+          id="edit-btn-${machine.id}"
+          class="text-industrial-blue font-medium hover:underline">
+          Edit
+        </button>
+
+        <button
+          id="delete-btn-${machine.id}"
+          class="text-industrial-safety font-medium hover:underline">
+          Delete
+        </button>
+      </div>
+    `;
+
+    grid.appendChild(card);
+    
+    // Add event listeners AFTER the element is added to DOM
+    setTimeout(() => {
+      const editBtn = document.getElementById(`edit-btn-${machine.id}`);
+      const deleteBtn = document.getElementById(`delete-btn-${machine.id}`);
+      
+      if (editBtn) {
+        editBtn.addEventListener('click', () => adminEditMachine(machine.id));
+      }
+      
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => adminDeleteMachine(machine.id));
+      }
+    }, 0);
+  });
+}
+
+
+function adminFilterInventoryGrid() {
+  try {
+    const searchTerm = document.getElementById('adminInventorySearch')?.value.toLowerCase() || '';
+    const categoryFilter = document.getElementById('adminInventoryFilter')?.value || 'all';
+    const cards = document.querySelectorAll('#adminInventoryGrid > div.bg-white');
+    
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+      const name = card.querySelector('h3')?.textContent.toLowerCase() || '';
+      const category = card.querySelector('.bg-gray-100')?.textContent || '';
+      const matchesSearch = name.includes(searchTerm);
+      const matchesCategory = categoryFilter === 'all' || category.includes(categoryFilter);
+      
+      if (matchesSearch && matchesCategory) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    
+    // Show/hide empty state
+    const empty = document.getElementById('adminInventoryEmpty');
+    const loading = document.getElementById('adminInventoryLoading');
+    if (visibleCount === 0 && cards.length > 0) {
+      if (empty) {
+        empty.classList.remove('hidden');
+        empty.innerHTML = `
+          <i class="fas fa-search text-gray-300 text-4xl mb-4"></i>
+          <h3 class="text-xl font-heading font-bold text-gray-500">No matching machines</h3>
+          <p class="text-gray-400 mt-2">Try adjusting your search or filter</p>
+        `;
+      }
+    } else {
+      if (empty) empty.classList.add('hidden');
+    }
+  } catch (error) {
+    console.error('Error in adminFilterInventoryGrid:', error);
+  }
+}
+
+// Admin Machine Form (CRUD)
+function openAdminMachineForm(id) {
+  const modal = document.getElementById('adminMachineFormModal');
+  const form = document.getElementById('adminMachineForm');
+  
+  // Reset form
+  form.reset();
+  document.getElementById('adminFormErrors').classList.add('hidden');
+  document.getElementById('adminImagePreviewContainer').classList.add('hidden');
+  document.getElementById('adminMachineId').value = '';
+  document.getElementById('adminMachineFormTitle').textContent = 'Add New Machine';
+  
+  // Preview image on URL change
+  document.getElementById('admin-m-image').addEventListener('input', function() {
+    const previewContainer = document.getElementById('adminImagePreviewContainer');
+    const previewImg = document.getElementById('adminImagePreview');
+    
+    if (this.value && this.value.startsWith('http')) {
+      previewImg.src = this.value;
+      previewContainer.classList.remove('hidden');
+    } else {
+      previewContainer.classList.add('hidden');
+    }
+  });
+  
+  // If editing, populate form
+  if (id) {
+    const machines = JSON.parse(localStorage.getItem("machines")) || [];
+    const machine = machines.find(m => m.id === id);
+    if (machine) {
+      document.getElementById('adminMachineFormTitle').textContent = 'Edit Machine: ' + machine.name;
+      document.getElementById('adminMachineId').value = machine.id;
+      document.getElementById('admin-m-name').value = machine.name;
+      document.getElementById('admin-m-category').value = machine.category;
+      document.getElementById('admin-m-price').value = machine.price;
+      document.getElementById('admin-m-status').value = machine.status;
+      document.getElementById('admin-m-image').value = machine.image;
+      document.getElementById('admin-m-safetyNotes').value = machine.safetyNotes || '';
+      
+      // Trigger image preview
+      if (machine.image) {
+        document.getElementById('adminImagePreview').src = machine.image;
+        document.getElementById('adminImagePreviewContainer').classList.remove('hidden');
+      }
+    }
+  }
+  
+  modal.classList.remove('hidden');
+}
+
+function closeAdminMachineForm() {
+  document.getElementById('adminMachineFormModal').classList.add('hidden');
+}
+
+function validateAdminMachineForm() {
+  const errors = [];
+  const name = document.getElementById('admin-m-name').value.trim();
+  const price = parseFloat(document.getElementById('admin-m-price').value);
+  const image = document.getElementById('admin-m-image').value.trim();
+  
+  // Name validation
+  if (name.length < 2) {
+    errors.push('Machine name must be at least 2 characters long');
+  }
+  
+  // Price validation
+  if (isNaN(price) || price < 1) {
+    errors.push('Price must be at least $1 per day');
+  }
+  
+  // Image URL validation (basic)
+  if (image && !image.startsWith('http')) {
+    errors.push('Image URL must be a valid web address (starting with http:// or https://)');
+  }
+  
+  return errors;
+}
+
+function saveAdminMachine(event) {
+  event.preventDefault();
+  
+  // Validate form
+  const errors = validateAdminMachineForm();
+  if (errors.length > 0) {
+    const errorList = document.getElementById('adminErrorList');
+    errorList.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
+    document.getElementById('adminFormErrors').classList.remove('hidden');
+    return;
+  }
+  
+  // Hide errors
+  document.getElementById('adminFormErrors').classList.add('hidden');
+  
+  // Show loading state
+  const button = document.getElementById('adminSaveMachineButton');
+  const originalText = button.innerHTML;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
+  button.disabled = true;
+  
+  // Simulate API delay
+  setTimeout(() => {
+    let machines = JSON.parse(localStorage.getItem("machines")) || [];
+    const id = document.getElementById('adminMachineId').value;
+    
+    const newMachine = {
+      name: document.getElementById('admin-m-name').value.trim(),
+      category: document.getElementById('admin-m-category').value,
+      price: parseFloat(document.getElementById('admin-m-price').value),
+      status: document.getElementById('admin-m-status').value,
+      image: document.getElementById('admin-m-image').value.trim(),
+      safetyNotes: document.getElementById('admin-m-safetyNotes').value.trim(),
+      specs: {},
+      lastService: new Date().toISOString().split('T')[0],
+      bookings: [],
+    };
+    
+    if (id) {
+      // EDIT existing machine
+      const index = machines.findIndex(m => m.id === parseInt(id));
+      if (index > -1) {
+        // Preserve existing properties
+        machines[index] = { 
+          ...machines[index], 
+          ...newMachine, 
+          id: parseInt(id),
+          specs: machines[index].specs || {},
+          bookings: machines[index].bookings || [],
+          rating: machines[index].rating || 4.5
+        };
+        adminShowNotification('Machine Updated', `${newMachine.name} has been updated successfully`, 'success');
+      }
+    } else {
+      // ADD new machine
+      const nextId = machines.length > 0 ? Math.max(...machines.map(m => m.id)) + 1 : 1;
+      newMachine.id = nextId;
+      newMachine.specs = { capacity: "Not specified" };
+      newMachine.bookings = [];
+      newMachine.rating = 4.5;
+      newMachine.condition = "Good";
+      newMachine.availableFrom = new Date().toISOString().split('T')[0];
+      machines.push(newMachine);
+      adminShowNotification('Machine Added', `${newMachine.name} has been added to inventory`, 'success');
+    }
+    
+    localStorage.setItem("machines", JSON.stringify(machines));
+    closeAdminMachineForm();
+    
+    // Reset button
+    button.innerHTML = originalText;
+    button.disabled = false;
+    
+    // Refresh inventory if on that tab
+    if (adminCurrentTab === 'inventory') {
+      adminRenderInventory();
+    }
+    
+    // Update dashboard
+    adminRenderDashboard();
+    
+    // Also refresh main site if open
+    renderMachines();
+  }, 800);
+}
+
+function adminEditMachine(id) {
+  console.log('Editing machine with ID:', id);
+  openAdminMachineForm(id);
+}
+
+function adminDeleteMachine(id) {
+  console.log('Deleting machine with ID:', id);
+  
+  // Convert id to number if it's a string
+  const machineId = typeof id === 'string' ? parseInt(id) : id;
+  
+  const machines = JSON.parse(localStorage.getItem("machines")) || [];
+  const machine = machines.find(m => m.id === machineId);
+  if (!machine) {
+    console.error('Machine not found with ID:', machineId);
+    return;
+  }
+  
+  if (confirm(`Are you sure you want to delete "${machine.name}"? This action cannot be undone.`)) {
+    let updatedMachines = machines.filter(m => m.id !== machineId);
+    localStorage.setItem("machines", JSON.stringify(updatedMachines));
+    
+    adminRenderInventory();
+    adminShowNotification('Machine Deleted', `${machine.name} has been removed from inventory`, 'warning');
+    
+    // Also refresh main site if open
+    renderMachines();
+  }
+}
+
+// Admin Order Management
+function adminRenderOrders() {
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const list = document.getElementById('adminOrderList');
+  const loading = document.getElementById('adminOrdersLoading');
+  const empty = document.getElementById('adminOrdersEmpty');
+  
+  // Show loading
+  list.innerHTML = '';
+  loading.classList.remove('hidden');
+  empty.classList.add('hidden');
+  
+  // Simulate loading delay
+  setTimeout(() => {
+    // Sort by newest first
+    let sortedOrders = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Check if empty
+    if (sortedOrders.length === 0) {
+      loading.classList.add('hidden');
+      empty.classList.remove('hidden');
+      return;
+    }
+    
+    // Render table
+    list.innerHTML = sortedOrders.map(o => {
+      const paymentColor = getAdminStatusColor(o.paymentStatus);
+      const statusColor = getAdminStatusColor(o.status);
+      const paymentStatusText = o.paymentStatus === 'pending' ? 'Pending' : 
+                               o.paymentStatus === 'pending_verification' ? 'Awaiting Verification' : 'Paid';
+      const statusText = o.status === 'pending' ? 'Pending' :
+                        o.status === 'pending_payment' ? 'Awaiting Payment' :
+                        o.status === 'confirmed' ? 'Confirmed' :
+                        o.status === 'completed' ? 'Completed' : 'Cancelled';
+      
+      // Check if there's payment proof
+      const hasPaymentProof = o.paymentProof && o.paymentProof.fileName;
+      
+      return `
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="p-4 font-bold">
+            <div class="flex items-center">
+              <i class="fas fa-receipt text-industrial-blue mr-2"></i>
+              ${o.id}
+            </div>
+          </td>
+          <td class="p-4">${new Date(o.date).toLocaleDateString()}</td>
+          <td class="p-4 font-bold">$${o.total}</td>
+          <td class="p-4">
+            <div class="flex items-center space-x-2">
+              <button onclick="adminTogglePaymentStatus('${o.id}')" 
+                class="admin-badge bg-${paymentColor}-100 text-${paymentColor} border-${paymentColor} hover:opacity-80 transition-opacity">
+                <i class="fas ${o.paymentStatus === 'pending' ? 'fa-clock' : 'fa-check-circle'} mr-1"></i>
+                ${paymentStatusText}
+              </button>
+              ${hasPaymentProof ? `
+                <span class="text-green-600" title="Payment proof uploaded">
+                  <i class="fas fa-paperclip"></i>
+                </span>
+              ` : ''}
+            </div>
+          </td>
+          <td class="p-4">
+            <button onclick="adminToggleOrderStatus('${o.id}')" 
+              class="admin-badge bg-${statusColor}-100 text-${statusColor} border-${statusColor} hover:opacity-80 transition-opacity">
+              ${statusText}
+            </button>
+          </td>
+          <td class="p-4">
+            <div>
+              <p class="font-medium">${o.customer.name}</p>
+              <p class="text-xs text-gray-500">${o.customer.email}</p>
+            </div>
+          </td>
+          <td class="p-4 text-center">
+            <div class="flex justify-center space-x-2">
+              <button onclick="adminOpenOrderDetails('${o.id}')" 
+                class="px-3 py-1 text-sm bg-industrial-blue text-white rounded hover:bg-blue-700 transition-colors flex items-center">
+                <i class="fas fa-eye mr-1"></i> View
+              </button>
+              ${hasPaymentProof && o.paymentStatus === 'pending_verification' ? `
+                <button onclick="adminVerifyPaymentProof('${o.id}')" 
+                  class="px-3 py-1 text-sm bg-industrial-green text-white rounded hover:bg-green-700 transition-colors flex items-center">
+                  <i class="fas fa-check mr-1"></i> Verify
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+    
+    loading.classList.add('hidden');
+    
+    // Apply any active filters
+    adminFilterOrderTable();
+  }, 300);
+}
+
+function adminVerifyPaymentProof(orderId) {
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const index = orders.findIndex(o => o.id === orderId);
+  
+  if (index === -1) {
+    adminShowNotification('Error', 'Order not found', 'error');
+    return;
+  }
+  
+  const order = orders[index];
+  
+  if (!order.paymentProof) {
+    adminShowNotification('Error', 'No payment proof found for this order', 'error');
+    return;
+  }
+  
+  if (order.paymentStatus === 'paid') {
+    adminShowNotification('Already Verified', 'This payment has already been verified', 'info');
+    return;
+  }
+  
+  // Show verification modal
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/70 flex justify-center items-center p-4 z-50';
+  modal.innerHTML = `
+    <div class="bg-white max-w-md w-full p-6 rounded-2xl shadow-lg animate-slide-up modal-content" onclick="event.stopPropagation()">
+      <h3 class="text-xl font-heading font-bold mb-4 text-industrial-gray">Verify Payment Proof</h3>
+      
+      <div class="space-y-4 mb-6">
+        <div class="bg-blue-50 p-4 rounded-xl">
+          <p class="font-bold text-blue-800">Order ID: ${order.id}</p>
+          <p class="text-blue-700">Customer: ${order.customer.name}</p>
+          <p class="text-blue-700">Amount: $${order.total}</p>
+        </div>
+        
+        <div class="bg-gray-50 p-4 rounded-xl">
+          <h4 class="font-bold text-gray-700 mb-2">Payment Proof Details</h4>
+          <p><span class="font-medium">File Name:</span> ${order.paymentProof.fileName}</p>
+          <p><span class="font-medium">Uploaded:</span> ${new Date(order.paymentProof.uploadDate).toLocaleDateString()}</p>
+          <p><span class="font-medium">Status:</span> ${order.paymentProof.status}</p>
+        </div>
+        
+        <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+          <h4 class="font-bold text-yellow-800 mb-2">Verification Notes</h4>
+          <textarea id="verificationNotes" rows="3" placeholder="Add notes about the verification (optional)" 
+            class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-industrial-yellow focus:border-industrial-yellow transition-all mt-2"></textarea>
+        </div>
+        
+        <div class="flex items-center">
+          <input type="checkbox" id="confirmVerification" class="mr-3">
+          <label for="confirmVerification" class="text-gray-700">
+            I confirm that the payment proof has been verified and is valid
+          </label>
+        </div>
+      </div>
+      
+      <div class="flex justify-end space-x-3">
+        <button onclick="this.parentElement.parentElement.remove()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          Cancel
+        </button>
+        <button onclick="adminConfirmPaymentVerification('${orderId}')" class="px-4 py-2 bg-industrial-green text-white rounded-lg hover:bg-green-700 transition-colors flex items-center">
+          <i class="fas fa-check mr-2"></i>
+          Verify Payment
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Close modal when clicking outside
+  modal.onclick = function(event) {
+    if (event.target.classList.contains('modal-overlay')) {
+      modal.remove();
+    }
+  };
+}
+
+function adminConfirmPaymentVerification(orderId) {
+  const confirmCheckbox = document.getElementById('confirmVerification');
+  if (!confirmCheckbox.checked) {
+    alert('Please confirm that you have verified the payment proof');
+    return;
+  }
+  
+  const notes = document.getElementById('verificationNotes').value;
+  
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const index = orders.findIndex(o => o.id === orderId);
+  
+  if (index === -1) return;
+  
+  // Update order status
+  orders[index].paymentStatus = 'paid';
+  orders[index].paymentProof.status = 'verified';
+  orders[index].paymentProof.verifiedDate = new Date().toISOString();
+  orders[index].paymentProof.verificationNotes = notes;
+  
+  // If payment is verified, update order status to confirmed
+  if (orders[index].status === 'pending_payment') {
+    orders[index].status = 'confirmed';
+  }
+  
+  localStorage.setItem("orders", JSON.stringify(orders));
+  
+  // Close modal
+  document.querySelector('.modal-overlay').remove();
+  
+  // Show success notification
+  adminShowNotification('Payment Verified', `Payment for order ${orderId} has been verified and order is now confirmed`, 'success');
+  
+  // Refresh orders table
+  adminRenderOrders();
+  adminRenderDashboard();
+}
+
+function adminFilterOrderTable() {
+  const searchTerm = document.getElementById('adminOrderSearch').value.toLowerCase();
+  const statusFilter = document.getElementById('adminOrderStatusFilter').value;
+  const rows = document.querySelectorAll('#adminOrderList tr');
+  
+  let visibleCount = 0;
+  
+  rows.forEach(row => {
+    const orderId = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+    const customer = row.querySelector('td:nth-child(6)').textContent.toLowerCase();
+    const status = row.querySelector('td:nth-child(5) button').textContent;
+    const matchesSearch = orderId.includes(searchTerm) || customer.includes(searchTerm);
+    const matchesStatus = statusFilter === 'all' || status.toLowerCase().includes(statusFilter.toLowerCase());
+    
+    if (matchesSearch && matchesStatus) {
+      row.style.display = '';
+      visibleCount++;
+    } else {
+      row.style.display = 'none';
+    }
+  });
+  
+  // Show/hide empty state
+  const empty = document.getElementById('adminOrdersEmpty');
+  if (visibleCount === 0 && rows.length > 0) {
+    empty.classList.remove('hidden');
+    empty.innerHTML = `
+      <i class="fas fa-search text-gray-300 text-4xl mb-4"></i>
+      <h3 class="text-xl font-heading font-bold text-gray-500">No matching orders</h3>
+      <p class="text-gray-400 mt-2">Try adjusting your search or filter</p>
+    `;
+  } else {
+    empty.classList.add('hidden');
+  }
+}
+
+function adminTogglePaymentStatus(orderId) {
+  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const index = orders.findIndex(o => o.id === orderId);
+  
+  if (index > -1) {
+    // If there's payment proof and it's pending verification, mark as paid
+    if (orders[index].paymentProof && orders[index].paymentProof.status === 'pending_verification') {
+      orders[index].paymentStatus = 'paid';
+      orders[index].paymentProof.status = 'verified';
+      orders[index].paymentProof.verifiedDate = new Date().toISOString();
+      
+      // Also update order status if it was pending payment
+      if (orders[index].status === 'pending_payment') {
+        orders[index].status = 'confirmed';
+      }
+      
+      adminShowNotification('Payment Verified', `Payment for order ${orderId} has been marked as paid`, 'success');
+    } else {
+      // Toggle between pending and pending_verification
+      orders[index].paymentStatus = orders[index].paymentStatus === 'pending' ? 'pending_verification' : 'pending';
+    }
+    
+    localStorage.setItem("orders", JSON.stringify(orders));
+    adminRenderOrders();
+    adminRenderDashboard();
+    
+    const status = orders[index].paymentStatus === 'pending' ? 'Pending' : 
+                  orders[index].paymentStatus === 'pending_verification' ? 'Awaiting Verification' : 'Paid';
+    adminShowNotification(
+      'Payment Status Updated', 
+      `Order ${orderId} payment marked as ${status}`, 
+      orders[index].paymentStatus === 'paid' ? 'success' : 'info'
+    );
+  }
+}
+
+function adminToggleOrderStatus(orderId) {
+  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const index = orders.findIndex(o => o.id === orderId);
+  
+  if (index > -1) {
+    const statusFlow = ['pending', 'pending_payment', 'confirmed', 'completed', 'cancelled'];
+    const currentIndex = statusFlow.indexOf(orders[index].status);
+    const nextIndex = (currentIndex + 1) % statusFlow.length;
+    orders[index].status = statusFlow[nextIndex];
+    
+    localStorage.setItem("orders", JSON.stringify(orders));
+    adminRenderOrders();
+    adminRenderDashboard();
+    
+    const statusText = orders[index].status === 'pending' ? 'Pending' :
+                      orders[index].status === 'pending_payment' ? 'Awaiting Payment' :
+                      orders[index].status === 'confirmed' ? 'Confirmed' :
+                      orders[index].status === 'completed' ? 'Completed' : 'Cancelled';
+    
+    adminShowNotification(
+      'Order Status Updated', 
+      `Order ${orderId} is now ${statusText}`, 
+      orders[index].status === 'completed' ? 'success' : 'info'
+    );
+  }
+}
+
+function adminOpenOrderDetails(orderId) {
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+  const order = orders.find(o => o.id === orderId);
+  
+  if (!order) return;
+  
+  document.getElementById('adminOrderDetailId').textContent = orderId;
+  
+  // Get machines for reference
+  const machines = JSON.parse(localStorage.getItem("machines")) || [];
+  
+  let content = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <h4 class="font-heading font-bold mb-3 text-lg">Order Information</h4>
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Order ID:</span>
+            <span class="font-bold">${order.id}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Date Placed:</span>
+            <span>${new Date(order.date).toLocaleDateString()}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Total Amount:</span>
+            <span class="font-bold text-lg">$${order.total}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Payment Status:</span>
+            <span class="font-medium text-${getAdminStatusColor(order.paymentStatus)}">${order.paymentStatus === 'pending' ? 'Pending' : order.paymentStatus === 'pending_verification' ? 'Awaiting Verification' : 'Paid'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Order Status:</span>
+            <span class="font-medium text-${getAdminStatusColor(order.status)}">${order.status === 'pending' ? 'Pending' : order.status === 'pending_payment' ? 'Awaiting Payment' : order.status}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <h4 class="font-heading font-bold mb-3 text-lg">Customer Information</h4>
+        <div class="space-y-2">
+          <div>
+            <p class="text-gray-600">Name</p>
+            <p class="font-medium">${order.customer?.name || 'Not specified'}</p>
+          </div>
+          <div>
+            <p class="text-gray-600">Email</p>
+            <p class="font-medium">${order.customer?.email || 'Not specified'}</p>
+          </div>
+          <div>
+            <p class="text-gray-600">Phone</p>
+            <p class="font-medium">${order.customer?.phone || 'Not specified'}</p>
+          </div>
+          ${order.customer?.company ? `
+          <div>
+            <p class="text-gray-600">Company</p>
+            <p class="font-medium">${order.customer.company}</p>
+          </div>
+          ` : ''}
+          <div>
+            <p class="text-gray-600">Address</p>
+            <p class="font-medium">${order.customer?.address || 'Pickup'}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    ${order.paymentProof ? `
+    <div class="mt-6">
+      <h4 class="font-heading font-bold mb-3 text-lg">Payment Proof Details</h4>
+      <div class="bg-${order.paymentProof.status === 'verified' ? 'green' : 'yellow'}-50 p-4 rounded-lg border border-${order.paymentProof.status === 'verified' ? 'green' : 'yellow'}-200">
+        <div class="flex justify-between items-start">
+          <div>
+            <h5 class="font-bold text-lg">${order.paymentProof.fileName}</h5>
+            <p class="text-sm text-gray-600">Uploaded: ${new Date(order.paymentProof.uploadDate).toLocaleDateString()}</p>
+            <p class="text-sm font-medium mt-1">Status: <span class="text-${order.paymentProof.status === 'verified' ? 'green' : 'yellow'}-600">${order.paymentProof.status === 'verified' ? 'Verified' : 'Pending Verification'}</span></p>
+            ${order.paymentProof.verifiedDate ? `
+              <p class="text-sm text-gray-600">Verified: ${new Date(order.paymentProof.verifiedDate).toLocaleDateString()}</p>
+            ` : ''}
+            ${order.paymentProof.verificationNotes ? `
+              <div class="mt-2">
+                <p class="text-sm font-medium">Verification Notes:</p>
+                <p class="text-sm text-gray-700 bg-white p-2 rounded mt-1">${order.paymentProof.verificationNotes}</p>
+              </div>
+            ` : ''}
+          </div>
+          ${order.paymentProof.status !== 'verified' ? `
+          <button onclick="adminVerifyPaymentProof('${orderId}')" 
+            class="px-4 py-2 bg-industrial-green text-white rounded-lg hover:bg-green-700 transition-colors flex items-center">
+            <i class="fas fa-check mr-2"></i>
+            Verify Now
+          </button>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+    ` : ''}
+    
+    <div class="mt-6">
+      <h4 class="font-heading font-bold mb-3 text-lg">Rented Items</h4>
+      <div class="space-y-4">
+        ${order.items?.map(item => {
+          const machine = machines.find(m => m.id === item.machineId);
+          const machineName = machine ? machine.name : 'Unknown Machine';
+          const pricePerDay = machine ? machine.price : 0;
+          const subtotal = machine ? machine.price * item.quantity * item.days : 0;
+          
+          return `
+            <div class="border border-gray-300 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h5 class="font-bold text-lg">${machineName}</h5>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">${item.quantity} units</span>
+                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">${item.days} days</span>
+                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">$${pricePerDay}/day</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-2xl font-bold">$${subtotal}</p>
+                  <p class="text-sm text-gray-500">Subtotal</p>
+                </div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-gray-300">
+                <p class="text-sm text-gray-600">
+                  <i class="far fa-calendar-alt mr-1"></i>
+                  Rental period: ${item.startDate} to ${item.endDate}
+                </p>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+    
+    <div class="mt-6 pt-6 border-t border-gray-300 flex justify-between">
+      <div>
+        ${order.paymentProof && order.paymentProof.status !== 'verified' && order.paymentMethod === 'bank' ? `
+          <button onclick="adminVerifyPaymentProof('${orderId}')" 
+            class="px-4 py-2 bg-industrial-green text-white rounded-lg hover:bg-green-700 transition-colors flex items-center">
+            <i class="fas fa-check mr-2"></i>
+            Verify Payment Proof
+          </button>
+        ` : ''}
+      </div>
+      <div class="space-x-3">
+        <button onclick="adminToggleOrderStatus('${orderId}')" 
+          class="px-4 py-2 bg-industrial-yellow text-white rounded-lg hover:bg-orange-600 transition-colors">
+          Change Status
+        </button>
+        <button onclick="closeAdminOrderDetails()" class="px-4 py-2 bg-industrial-blue text-white rounded-lg hover:bg-blue-700 transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('adminOrderDetailContent').innerHTML = content;
+  document.getElementById('adminOrderDetailsModal').classList.remove('hidden');
+}
+
+function closeAdminOrderDetails() {
+  document.getElementById('adminOrderDetailsModal').classList.add('hidden');
+}
+
+/* ==================== ORIGINAL FUNCTIONS ==================== */
+/* ---------- GLOBAL STATE & INITIAL DATA ---------- */
+const today = new Date().toISOString().split('T')[0];
+const ITEMS_PER_PAGE = 9;
+let currentPage = 1;
+let currentCategoryFilter = 'All';
+let currentSearchQuery = '';
+let selectedId = null;
+let currentStep = 1;
+let selectedDeliveryOption = null;
+let selectedPaymentMethod = null;
+
+// Initialize data in localStorage
+if (!localStorage.getItem("machines")) {
+  localStorage.setItem("machines", JSON.stringify([
+    { 
+      id: 1, 
+      name: "Hydraulic Excavator", 
+      category: "Earthmoving", 
+      price: 250, 
+      status: "Available", 
+      image: "https://images.unsplash.com/photo-1579761596207-6c2306f1d07c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHNlYXJjaHwxfHhleGNhdmF0b3J8ZW58MHx8fHwxNzAzNTQ5Mjk5fDA&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { capacity: "1.2 m³", enginePower: "150 HP" }, 
+      condition: "Excellent", 
+      lastService: "2025-07-10", 
+      safetyNotes: "Operator certification required. Helmet and safety boots mandatory.", 
+      bookings: [], 
+      rating: 4.8,
+      availableFrom: "2024-01-15"
+    },
+    { 
+      id: 2, 
+      name: "Scissor Lift", 
+      category: "Lifting", 
+      price: 180, 
+      status: "Rented", 
+      image: "https://images.unsplash.com/photo-1594165682137-77b7890130f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHxsaWZ0JTIwbWFjaGluZXxlbnwwfHx8fDE3MDM1NDkzMTF8MA&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { maxHeight: "12 m", loadCapacity: "450 kg" }, 
+      condition: "Good", 
+      lastService: "2025-06-28", 
+      safetyNotes: "Do not exceed load limit. Use on level ground only.", 
+      bookings: [], 
+      rating: 4.5,
+      availableFrom: "2024-02-01"
+    },
+    { 
+      id: 3, 
+      name: "Telescopic Handler", 
+      category: "Material Handling", 
+      price: 210, 
+      status: "Available", 
+      image: "https://images.unsplash.com/photo-1558239088-b4b321a4f009?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHx0ZWxlc2NvcGljJTIwaGFuZGxlcnxlbnwwfHx8fDE3MDM1NDkzMjh8MA&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { maxReach: "15 m", maxLiftCapacity: "4,000 kg" }, 
+      condition: "Excellent", 
+      lastService: "2025-08-01", 
+      safetyNotes: "Requires spotter during full extension. Check stability indicators.", 
+      bookings: [], 
+      rating: 4.9,
+      availableFrom: today
+    },
+    { 
+      id: 4, 
+      name: "Single Drum Compactor", 
+      category: "Road Construction", 
+      price: 195, 
+      status: "Available", 
+      image: "https://images.unsplash.com/photo-1549419163-95249e29a98e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHJvYWQlMjByb2xsZXJ8ZW58MHx8fHwxNzAzNTQ5MzQzfDA&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { drumWidth: "1,500 mm", vibrationFrequency: "33 Hz" }, 
+      condition: "Good", 
+      lastService: "2025-05-20", 
+      safetyNotes: "Wear ear protection. Maintain safe distance from edge of slope.", 
+      bookings: [], 
+      rating: 4.6,
+      availableFrom: today
+    },
+    { 
+      id: 5, 
+      name: "Concrete Mixer", 
+      category: "Construction", 
+      price: 95, 
+      status: "Available", 
+      image: "https://images.unsplash.com/photo-1531835565551-736021665e8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHNlYXJjaHwxfHxjb25jcmV0ZSUyMG1peGVyfGVufDB8fHx8MTcwMzU2NTQ5MHww&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { drumCapacity: "350 L", power: "Electric" }, 
+      condition: "Good", 
+      lastService: "2025-05-15", 
+      safetyNotes: "Lock drum before maintenance.", 
+      bookings: [], 
+      rating: 4.3,
+      availableFrom: today
+    },
+    { 
+      id: 6, 
+      name: "Skid Steer Loader", 
+      category: "Earthmoving", 
+      price: 170, 
+      status: "Available", 
+      image: "https://images.unsplash.com/photo-1628174780590-7f9a46f7f63b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHNlYXJjaHwxfHxza2lkJTIwc3RlZXJ8ZW58MHx8fHwxNzAzNTY1NTA0fDA&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { liftCapacity: "800 kg", reach: "2.5 m" }, 
+      condition: "Excellent", 
+      lastService: "2025-09-01", 
+      safetyNotes: "Keep arms and legs inside cab.", 
+      bookings: [], 
+      rating: 4.7,
+      availableFrom: "2024-01-20"
+    },
+    { 
+      id: 7, 
+      name: "Portable Generator", 
+      category: "Power", 
+      price: 60, 
+      status: "Rented", 
+      image: "https://images.unsplash.com/photo-1620286819515-408a2879c93f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHNlYXJjaHwxfHxwb3J0YWJsZSUyMGdlbmVyYXRvcnxlbnwwfHx8fDE3MDM1NjU1MTV8MA&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { output: "5000 W", fuel: "Gasoline" }, 
+      condition: "New", 
+      lastService: "2025-10-20", 
+      safetyNotes: "Use only in well-ventilated areas.", 
+      bookings: [], 
+      rating: 4.4,
+      availableFrom: "2024-02-15"
+    },
+    { 
+      id: 8, 
+      name: "Industrial Air Compressor", 
+      category: "Utility", 
+      price: 110, 
+      status: "Available", 
+      image: "https://images.unsplash.com/photo-1610444583163-470a1a51167b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHNlYXJjaHwxfHxhciUyMGNvbXByZXNzb3J8ZW58MHx8fHwxNzAzNTY1NTI4fDA&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { pressure: "175 PSI", tank: "80 Gal" }, 
+      condition: "Good", 
+      lastService: "2025-08-15", 
+      safetyNotes: "Always wear safety glasses when operating tools.", 
+      bookings: [], 
+      rating: 4.5,
+      availableFrom: today
+    },
+    { 
+      id: 9, 
+      name: "Dump Truck (Small)", 
+      category: "Transportation", 
+      price: 300, 
+      status: "Available", 
+      image: "https://images.unsplash.com/photo-1599388047970-d7af99580b08?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTk0MTN8MHwxfHNlYXJjaHwxfHhkdW1wJTIwdHJ1Y2t8ZW58MHx8fHwxNzAzNTY1NTU1fDA&ixlib=rb-4.0.3&q=80&w=1080", 
+      specs: { payload: "5,000 kg", fuelType: "Diesel" }, 
+      condition: "Excellent", 
+      lastService: "2025-11-01", 
+      safetyNotes: "Requires CDL. Check bed lock before driving.", 
+      bookings: [], 
+      rating: 4.8,
+      availableFrom: today
+    },
+  ]));
+}
+
+if (!localStorage.getItem("cart")) {
+  localStorage.setItem("cart", JSON.stringify([]));
+}
+
+if (!localStorage.getItem("wishlist")) {
+  localStorage.setItem("wishlist", JSON.stringify([]));
+}
+
+if (!localStorage.getItem("orders")) {
+  localStorage.setItem("orders", JSON.stringify([]));
+}
+
+// Generate unique order ID
+function generateOrderId() {
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 10000);
+  return `ORD-${timestamp}-${random}`;
+}
+
+/* ---------- MODAL CLOSE ON OUTSIDE CLICK ---------- */
+function closeModalOnOutsideClick(event, modalId) {
+  if (event.target.classList.contains('modal-overlay')) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+}
+
+// Add click handlers for all modals
+document.addEventListener('DOMContentLoaded', function() {
+  // All modals already have onclick handlers in their HTML
+});
+
+/* ---------- UPDATE NAVIGATION BADGES ---------- */
+function updateNavigationBadges() {
+  // Cart badge
+  const cart = JSON.parse(localStorage.getItem("cart"));
+  const cartBadge = document.getElementById("cartBadge");
+  cartBadge.textContent = cart.length;
+  cartBadge.classList.toggle("hidden", cart.length === 0);
+  
+  // Wishlist badge
+  const wishlist = JSON.parse(localStorage.getItem("wishlist"));
+  const wishlistBadge = document.getElementById("wishlistBadge");
+  wishlistBadge.textContent = wishlist.length;
+  wishlistBadge.classList.toggle("hidden", wishlist.length === 0);
+  
+  // Orders badge (pending + pending_payment)
+  const orders = JSON.parse(localStorage.getItem("orders"));
+  const activeOrders = orders.filter(order => 
+    order.status === 'pending' || order.status === 'pending_payment'
+  ).length;
+  const ordersBadge = document.getElementById("ordersBadge");
+  ordersBadge.textContent = activeOrders;
+  ordersBadge.classList.toggle("hidden", activeOrders === 0);
+}
+
+/* ---------- BOOKING MODAL FUNCTIONS ---------- */
+function openCompleteBookingModal() {
+  const cart = JSON.parse(localStorage.getItem("cart"));
+  if (cart.length === 0) {
+    alert("Your cart is empty. Please add items to book.");
+    return;
+  }
+  
+  // Reset modal state
+  currentStep = 1;
+  selectedDeliveryOption = null;
+  selectedPaymentMethod = null;
+  
+  // Update progress bar and step numbers
+  updateProgressBar();
+  
+  // Show first step
+  document.querySelectorAll('[id^="step"]').forEach(step => {
+    step.classList.add('hidden');
+  });
+  document.getElementById('step1').classList.remove('hidden');
+  
+  // Clear previous selections
+  document.querySelectorAll('.delivery-option').forEach(opt => {
+    opt.classList.remove('selected');
+  });
+  document.querySelectorAll('.payment-method').forEach(opt => {
+    opt.classList.remove('selected');
+  });
+  
+  // Clear form fields
+  document.getElementById('bookingName').value = '';
+  document.getElementById('bookingEmail').value = '';
+  document.getElementById('bookingPhone').value = '';
+  document.getElementById('bookingCompany').value = '';
+  document.getElementById('bookingAddress').value = '';
+  document.getElementById('deliveryDate').value = '';
+  document.getElementById('deliveryTime').value = '';
+  document.getElementById('deliveryInstructions').value = '';
+  document.getElementById('termsAgreement').checked = false;
+  document.getElementById('bankTransferInfo').classList.add('hidden');
+  document.getElementById('deliveryDetails').classList.add('hidden');
+  
+  closeCart();
+  document.getElementById('completeBookingModal').classList.remove('hidden');
+}
+
+function closeCompleteBookingModal() {
+  document.getElementById('completeBookingModal').classList.add('hidden');
+}
+
+function updateProgressBar() {
+  const progress = (currentStep / 4) * 100;
+  document.getElementById('progressBar').style.width = `${progress}%`;
+  
+  // Update step numbers (no color change, just active class)
+  document.querySelectorAll('.step-number').forEach((step, index) => {
+    step.classList.remove('active', 'completed');
+    if (index + 1 <= currentStep) {
+      step.classList.add('active');
+    }
+  });
+}
+
+function nextStep(step) {
+  // Validate current step
+  if (currentStep === 1) {
+    if (!validateStep1()) return;
+  } else if (currentStep === 2) {
+    if (!validateStep2()) return;
+  } else if (currentStep === 3) {
+    if (!validateStep3()) return;
+  }
+  
+  currentStep = step;
+  updateProgressBar();
+  
+  // Hide all steps
+  document.querySelectorAll('[id^="step"]').forEach(step => {
+    step.classList.add('hidden');
+  });
+  
+  // Show current step
+  document.getElementById(`step${step}`).classList.remove('hidden');
+  
+  // If this is step 4, populate review
+  if (step === 4) {
+    populateReview();
+  }
+}
+
+function prevStep(step) {
+  currentStep = step;
+  updateProgressBar();
+  
+  document.querySelectorAll('[id^="step"]').forEach(step => {
+    step.classList.add('hidden');
+  });
+  
+  document.getElementById(`step${step}`).classList.remove('hidden');
+}
+
+function validateStep1() {
+  const name = document.getElementById('bookingName').value.trim();
+  const email = document.getElementById('bookingEmail').value.trim();
+  const phone = document.getElementById('bookingPhone').value.trim();
+  
+  if (!name) {
+    alert("Please enter your full name.");
+    return false;
+  }
+  
+  if (!email) {
+    alert("Please enter your email address.");
+    return false;
+  }
+  
+  // Basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert("Please enter a valid email address.");
+    return false;
+  }
+  
+  if (!phone) {
+    alert("Please enter your phone number.");
+    return false;
+  }
+  
+  return true;
+}
+
+function validateStep2() {
+  if (!selectedDeliveryOption) {
+    alert("Please select a delivery option.");
+    return false;
+  }
+  
+  // Address is only required for delivery
+  if (selectedDeliveryOption === 'delivery') {
+    const address = document.getElementById('bookingAddress').value.trim();
+    const deliveryDate = document.getElementById('deliveryDate').value;
+    const deliveryTime = document.getElementById('deliveryTime').value;
+    
+    if (!address) {
+      alert("Please enter a delivery address. Address is required for delivery.");
+      return false;
+    }
+    
+    if (!deliveryDate) {
+      alert("Please select a delivery date.");
+      return false;
+    }
+    
+    if (!deliveryTime) {
+      alert("Please select a delivery time window.");
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+function validateStep3() {
+  if (!selectedPaymentMethod) {
+    alert("Please select a payment method.");
+    return false;
+  }
+  
+  return true;
+}
+
+function selectDeliveryOption(option, element) {
+  selectedDeliveryOption = option;
+  
+  // Remove selected class from all options
+  document.querySelectorAll('.delivery-option').forEach(opt => {
+    opt.classList.remove('selected');
+  });
+  
+  // Add selected class to clicked option
+  element.classList.add('selected');
+  
+  // Show/hide delivery details
+  if (option === 'delivery') {
+    document.getElementById('deliveryDetails').classList.remove('hidden');
+  } else {
+    document.getElementById('deliveryDetails').classList.add('hidden');
+  }
+}
+
+function selectPaymentMethod(method, element) {
+  selectedPaymentMethod = method;
+  
+  // Remove selected class from all options
+  document.querySelectorAll('.payment-method').forEach(opt => {
+    opt.classList.remove('selected');
+  });
+  
+  // Add selected class to clicked option
+  element.classList.add('selected');
+  
+  // Show/hide bank transfer info
+  if (method === 'bank') {
+    document.getElementById('bankTransferInfo').classList.remove('hidden');
+  } else {
+    document.getElementById('bankTransferInfo').classList.add('hidden');
+  }
+}
+
+function populateReview() {
+  const cart = JSON.parse(localStorage.getItem("cart"));
+  const machines = JSON.parse(localStorage.getItem("machines"));
+  let total = 0;
+  
+  // Order Summary
+  let orderSummaryHTML = '';
+  cart.forEach(item => {
+    const m = machines.find(x => x.id === item.machineId);
+    const cost = m.price * item.quantity * item.days;
+    total += cost;
+    
+    orderSummaryHTML += `
+      <div class="flex justify-between items-center py-3 border-b border-gray-200">
+        <div>
+          <p class="font-medium">${m.name}</p>
+          <p class="text-sm text-gray-600">${item.quantity} × $${m.price}/day × ${item.days} days</p>
+          <p class="text-sm text-gray-600">${item.startDate} to ${item.endDate}</p>
+        </div>
+        <p class="font-bold">$${cost}</p>
+      </div>
+    `;
+  });
+  
+  document.getElementById('orderSummary').innerHTML = orderSummaryHTML;
+  document.getElementById('orderTotal').textContent = `$${total}`;
+  
+  // Customer Information
+  const customerInfo = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <p class="text-sm text-gray-600">Name</p>
+        <p class="font-medium">${document.getElementById('bookingName').value}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600">Email</p>
+        <p class="font-medium">${document.getElementById('bookingEmail').value}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600">Phone</p>
+        <p class="font-medium">${document.getElementById('bookingPhone').value}</p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600">Company</p>
+        <p class="font-medium">${document.getElementById('bookingCompany').value || 'Not provided'}</p>
+      </div>
+      <div class="md:col-span-2">
+        <p class="text-sm text-gray-600">Address</p>
+        <p class="font-medium">${document.getElementById('bookingAddress').value || (selectedDeliveryOption === 'pickup' ? 'Pickup at warehouse' : 'Not provided')}</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('customerInfo').innerHTML = customerInfo;
+  
+  // Delivery & Payment Info
+  let deliveryInfo = '';
+  if (selectedDeliveryOption === 'pickup') {
+    deliveryInfo = `
+      <p class="text-sm text-gray-600 mb-2">Delivery Method</p>
+      <p class="font-medium">Pickup at Warehouse</p>
+      <p class="text-sm text-gray-600 mt-4">Pickup Address</p>
+      <p class="font-medium">789 Industrial Way, City, State 12345</p>
+    `;
+  } else {
+    deliveryInfo = `
+      <p class="text-sm text-gray-600 mb-2">Delivery Method</p>
+      <p class="font-medium">Delivery to Site</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div>
+          <p class="text-sm text-gray-600">Delivery Date</p>
+          <p class="font-medium">${document.getElementById('deliveryDate').value}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Time Window</p>
+          <p class="font-medium">${document.getElementById('deliveryTime').options[document.getElementById('deliveryTime').selectedIndex].text}</p>
+        </div>
+      </div>
+      ${document.getElementById('deliveryInstructions').value ? `
+        <div class="mt-4">
+          <p class="text-sm text-gray-600">Special Instructions</p>
+          <p class="font-medium">${document.getElementById('deliveryInstructions').value}</p>
+        </div>
+      ` : ''}
+    `;
+  }
+  
+  let paymentInfo = '';
+  if (selectedPaymentMethod === 'cash') {
+    paymentInfo = `
+      <p class="text-sm text-gray-600 mb-2">Payment Method</p>
+      <p class="font-medium">Cash on Delivery/Acceptance</p>
+      <p class="text-sm text-gray-600 mt-2">Pay when equipment is delivered or picked up</p>
+    `;
+  } else {
+    paymentInfo = `
+      <p class="text-sm text-gray-600 mb-2">Payment Method</p>
+      <p class="font-medium">Bank Transfer</p>
+      <p class="text-sm text-gray-600 mt-2">Payment verification required before confirmation</p>
+    `;
+  }
+  
+  document.getElementById('deliveryPaymentInfo').innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white p-4 rounded-xl">
+        ${deliveryInfo}
+      </div>
+      <div class="bg-white p-4 rounded-xl">
+        ${paymentInfo}
+      </div>
+    </div>
+  `;
+}
+
+function submitBooking() {
+  // Validate terms agreement
+  if (!document.getElementById('termsAgreement').checked) {
+    alert("Please agree to the Terms and Conditions to proceed.");
+    return;
+  }
+  
+  // Show loading state
+  document.getElementById('submitButtonText').textContent = 'Processing...';
+  document.getElementById('loadingSpinner').classList.remove('hidden');
+  
+  // Simulate processing delay
+  setTimeout(() => {
+    const cart = JSON.parse(localStorage.getItem("cart"));
+    const machines = JSON.parse(localStorage.getItem("machines"));
+    let orders = JSON.parse(localStorage.getItem("orders"));
+    
+    // Generate order ID
+    const orderId = generateOrderId();
+    const now = new Date().toISOString();
+    
+    // Calculate total
+    let total = 0;
+    cart.forEach(item => {
+      const m = machines.find(x => x.id === item.machineId);
+      total += m.price * item.quantity * item.days;
+    });
+    
+    // Create order object
+    const order = {
+      id: orderId,
+      date: now,
+      status: selectedPaymentMethod === 'cash' ? 'pending' : 'pending_payment',
+      paymentMethod: selectedPaymentMethod,
+      paymentStatus: selectedPaymentMethod === 'cash' ? 'pending' : 'pending_verification',
+      deliveryMethod: selectedDeliveryOption,
+      total: total,
+      items: [...cart],
+      customer: {
+        name: document.getElementById('bookingName').value,
+        email: document.getElementById('bookingEmail').value,
+        phone: document.getElementById('bookingPhone').value,
+        company: document.getElementById('bookingCompany').value,
+        address: document.getElementById('bookingAddress').value
+      },
+      delivery: selectedDeliveryOption === 'delivery' ? {
+        date: document.getElementById('deliveryDate').value,
+        time: document.getElementById('deliveryTime').value,
+        instructions: document.getElementById('deliveryInstructions').value
+      } : null,
+      notes: ''
+    };
+    
+    // Add to orders
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
+    
+    // Update machine status
+    cart.forEach(item => {
+      const m = machines.find(x => x.id === item.machineId);
+      if (m) {
+        m.status = "Rented";
+        m.bookings.push({
+          orderId: orderId,
+          days: item.days,
+          startDate: item.startDate,
+          endDate: item.endDate,
+          quantity: item.quantity
+        });
+      }
+    });
+    
+    localStorage.setItem("machines", JSON.stringify(machines));
+    
+    // Clear cart
+    localStorage.setItem("cart", JSON.stringify([]));
+    updateNavigationBadges();
+    
+    // Close modals and show confirmation
+    closeCompleteBookingModal();
+    
+    // Update confirmation modal based on payment method
+    if (selectedPaymentMethod === 'cash') {
+      document.getElementById('confirmTitle').textContent = 'Booking Placed!';
+      document.getElementById('confirmMessage').textContent = 'Your order has been placed. Please be ready with cash payment when equipment is delivered/picked up.';
+      document.getElementById('confirmIcon').textContent = '📋';
+    } else {
+      document.getElementById('confirmTitle').textContent = 'Order Created!';
+      document.getElementById('confirmMessage').textContent = 'Your order has been created. Please complete bank transfer to confirm booking. Use the Order ID below as reference.';
+      document.getElementById('confirmIcon').textContent = '🏦';
+    }
+    
+    document.getElementById('orderIdDisplay').textContent = `Order ID: ${orderId}`;
+    document.getElementById('confirmModal').classList.remove('hidden');
+    
+    // Reset button state
+    document.getElementById('submitButtonText').textContent = 'Confirm & Place Order';
+    document.getElementById('loadingSpinner').classList.add('hidden');
+    
+    // Refresh machines display
+    renderMachines();
+    
+    // Also refresh admin dashboard if open
+    if (adminCurrentTab === 'orders' || adminCurrentTab === 'dashboard') {
+      adminRenderOrders();
+      adminRenderDashboard();
+    }
+    
+  }, 1500);
+}
+
+/* ---------- ORDERS MODAL FUNCTIONS ---------- */
+function openOrders() {
+  loadOrders('all');
+  document.getElementById('ordersModal').classList.remove('hidden');
+}
+
+function closeOrders() {
+  document.getElementById('ordersModal').classList.add('hidden');
+}
+
+function loadOrders(filter = 'all') {
+  const orders = JSON.parse(localStorage.getItem("orders"));
+  const machines = JSON.parse(localStorage.getItem("machines"));
+  const ordersList = document.getElementById('ordersList');
+  const noOrders = document.getElementById('noOrders');
+  
+  ordersList.innerHTML = '';
+  
+  // Filter orders
+  let filteredOrders = orders;
+  if (filter !== 'all') {
+    filteredOrders = orders.filter(order => {
+      if (filter === 'pending') return order.status === 'pending';
+      if (filter === 'confirmed') return order.status === 'confirmed';
+      if (filter === 'completed') return order.status === 'completed';
+      if (filter === 'cancelled') return order.status === 'cancelled';
+      return true;
+    });
+  }
+  
+  if (filteredOrders.length === 0) {
+    ordersList.classList.add('hidden');
+    noOrders.classList.remove('hidden');
+    return;
+  }
+  
+  noOrders.classList.add('hidden');
+  ordersList.classList.remove('hidden');
+  
+  // Sort by date (newest first)
+  filteredOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  filteredOrders.forEach(order => {
+    let statusColor = 'bg-gray-500';
+    let statusText = 'Unknown';
+    
+    switch(order.status) {
+      case 'pending':
+        statusColor = 'bg-yellow-500';
+        statusText = 'Pending';
+        break;
+      case 'pending_payment':
+        statusColor = 'bg-blue-500';
+        statusText = 'Awaiting Payment';
+        break;
+      case 'confirmed':
+        statusColor = 'bg-green-500';
+        statusText = 'Confirmed';
+        break;
+      case 'completed':
+        statusColor = 'bg-industrial-green';
+        statusText = 'Completed';
+        break;
+      case 'cancelled':
+        statusColor = 'bg-red-500';
+        statusText = 'Cancelled';
+        break;
+    }
+    
+    // Format date
+    const orderDate = new Date(order.date);
+    const formattedDate = orderDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    
+    // Get machine names
+    const machineNames = order.items.map(item => {
+      const m = machines.find(x => x.id === item.machineId);
+      return m ? `${m.name} (x${item.quantity})` : 'Unknown Machine';
+    }).join(', ');
+    
+    ordersList.innerHTML += `
+      <div class="border border-gray-200 rounded-2xl p-6 bg-gradient-to-r from-gray-50 to-white">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h3 class="font-heading font-bold text-lg">Order: ${order.id}</h3>
+            <p class="text-gray-600 text-sm">Placed on ${formattedDate}</p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-sm font-bold text-white ${statusColor}">
+            ${statusText}
+          </span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <div>
+            <p class="text-sm text-gray-600">Items</p>
+            <p class="font-medium">${machineNames}</p>
+            <p class="text-sm text-gray-600 mt-2">Delivery Method</p>
+            <p class="font-medium">${order.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Payment Method</p>
+            <p class="font-medium">${order.paymentMethod === 'cash' ? 'Cash on Delivery' : 'Bank Transfer'}</p>
+            <p class="text-sm text-gray-600 mt-2">Payment Status</p>
+            <p class="font-medium">${order.paymentStatus === 'pending' ? 'Pending' : order.paymentStatus === 'pending_verification' ? 'Awaiting Verification' : 'Paid'}</p>
+            ${order.paymentProof ? `
+              <p class="text-sm text-blue-600 mt-2">
+                ✅ Payment proof uploaded (${order.paymentProof.fileName})
+              </p>
+            ` : ''}
+          </div>
+        </div>
+        
+        <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+          <div>
+            <p class="text-sm text-gray-600">Total Amount</p>
+            <p class="font-heading font-bold text-xl text-industrial-yellow">$${order.total}</p>
+          </div>
+          <div class="space-x-2">
+            ${order.status === 'pending_payment' ? `
+              <button onclick="showPaymentInstructions('${order.id}')" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium">
+                View Payment Instructions
+              </button>
+            ` : ''}
+            <button onclick="viewOrderDetails('${order.id}')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl text-sm font-medium">
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function filterOrders(filter) {
+  loadOrders(filter);
+}
+
+function viewOrderDetails(orderId) {
+  const orders = JSON.parse(localStorage.getItem("orders"));
+  const machines = JSON.parse(localStorage.getItem("machines"));
+  const order = orders.find(o => o.id === orderId);
+  
+  if (!order) return;
+  
+  let orderDetails = `
+    <div class="bg-white p-6 rounded-2xl shadow-lg max-w-2xl mx-auto">
+      <h3 class="font-heading font-bold text-2xl mb-4">Order Details: ${order.id}</h3>
+      
+      <div class="space-y-6">
+        <div>
+          <h4 class="font-bold text-lg mb-2">Order Items</h4>
+          ${order.items.map(item => {
+            const m = machines.find(x => x.id === item.machineId);
+            return `
+              <div class="flex justify-between items-center py-3 border-b border-gray-200">
+                <div>
+                  <p class="font-medium">${m ? m.name : 'Unknown Machine'}</p>
+                  <p class="text-sm text-gray-600">Quantity: ${item.quantity} | Days: ${item.days}</p>
+                  <p class="text-sm text-gray-600">Dates: ${item.startDate} to ${item.endDate}</p>
+                </div>
+                <p class="font-medium">$${m ? m.price * item.quantity * item.days : 0}</p>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="font-bold text-lg mb-2">Customer Information</h4>
+            <p><span class="text-gray-600">Name:</span> ${order.customer.name}</p>
+            <p><span class="text-gray-600">Email:</span> ${order.customer.email}</p>
+            <p><span class="text-gray-600">Phone:</span> ${order.customer.phone}</p>
+            ${order.customer.company ? `<p><span class="text-gray-600">Company:</span> ${order.customer.company}</p>` : ''}
+            <p><span class="text-gray-600">Address:</span> ${order.customer.address || 'Pickup'}</p>
+          </div>
+          
+          <div>
+            <h4 class="font-bold text-lg mb-2">Order Information</h4>
+            <p><span class="text-gray-600">Order Date:</span> ${new Date(order.date).toLocaleDateString()}</p>
+            <p><span class="text-gray-600">Status:</span> ${order.status}</p>
+            <p><span class="text-gray-600">Payment Method:</span> ${order.paymentMethod === 'cash' ? 'Cash on Delivery' : 'Bank Transfer'}</p>
+            <p><span class="text-gray-600">Payment Status:</span> ${order.paymentStatus}</p>
+            <p><span class="text-gray-600">Delivery:</span> ${order.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}</p>
+            ${order.delivery ? `
+              <p><span class="text-gray-600">Delivery Date:</span> ${order.delivery.date}</p>
+              <p><span class="text-gray-600">Delivery Time:</span> ${order.delivery.time}</p>
+            ` : ''}
+          </div>
+        </div>
+        
+        <div class="text-center pt-4 border-t border-gray-200">
+          <p class="font-heading font-bold text-2xl text-industrial-yellow">Total: $${order.total}</p>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Create modal for order details
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 modal-overlay';
+  modal.innerHTML = `
+    <div class="relative modal-content" onclick="event.stopPropagation()">
+      <button onclick="this.parentElement.parentElement.remove()" class="absolute -top-10 right-0 text-white text-2xl">&times;</button>
+      ${orderDetails}
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Add click handler to close when clicking outside
+  modal.onclick = function(event) {
+    if (event.target.classList.contains('modal-overlay')) {
+      modal.remove();
+    }
+  };
+}
+
+function showPaymentInstructions(orderId) {
+  const orders = JSON.parse(localStorage.getItem("orders"));
+  const order = orders.find(o => o.id === orderId);
+  
+  if (!order) return;
+  
+  const instructions = `
+    <div class="bg-white p-8 rounded-2xl shadow-lg max-w-lg mx-auto modal-content" onclick="event.stopPropagation()">
+      <h3 class="font-heading font-bold text-2xl mb-4 text-blue-800">Payment Instructions</h3>
+      
+      <div class="space-y-4">
+        <div class="bg-blue-50 p-4 rounded-xl">
+          <p class="font-bold text-blue-800 mb-2">Order ID: ${order.id}</p>
+          <p class="text-blue-700">Please use this Order ID as payment reference</p>
+        </div>
+        
+        <div>
+          <h4 class="font-bold text-gray-700 mb-2">Bank Details:</h4>
+          <div class="bg-gray-100 p-4 rounded-xl">
+            <p><span class="font-medium">Bank:</span> First National Bank</p>
+            <p><span class="font-medium">Account:</span> 1234567890</p>
+            <p><span class="font-medium">Routing:</span> 021000021</p>
+            <p><span class="font-medium">Amount:</span> $${order.total}</p>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="font-bold text-gray-700 mb-2">Upload Proof of Payment</h4>
+          <p class="text-sm text-gray-600 mb-3">Upload a screenshot or PDF of your bank transfer confirmation</p>
+          <input type="file" id="paymentProofFile" accept=".pdf,.jpg,.jpeg,.png" 
+            class="w-full border-2 border-gray-300 p-3 rounded-xl mb-3">
+          <button onclick="uploadPaymentProof('${orderId}')" 
+            class="w-full bg-industrial-green hover:bg-green-600 text-white py-3 rounded-xl font-bold">
+            Upload & Submit for Verification
+          </button>
+        </div>
+        
+        <div>
+          <h4 class="font-bold text-gray-700 mb-2">Important Notes:</h4>
+          <ul class="list-disc pl-5 space-y-2 text-gray-600">
+            <li>Your booking will be confirmed within 24 hours after payment verification</li>
+            <li>Keep your payment receipt/screenshot for reference</li>
+            <li>Contact support@machineryhub.com for assistance</li>
+            <li>Order will be automatically cancelled after 48 hours if payment is not received</li>
+          </ul>
+        </div>
+        
+        <div class="text-center mt-6">
+          <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" 
+            class="bg-industrial-yellow hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 modal-overlay';
+  modal.innerHTML = instructions;
+  
+  document.body.appendChild(modal);
+  
+  // Add click handler to close when clicking outside
+  modal.onclick = function(event) {
+    if (event.target.classList.contains('modal-overlay')) {
+      modal.remove();
+    }
+  };
+}
+
+function uploadPaymentProof(orderId) {
+  const fileInput = document.getElementById('paymentProofFile');
+  const file = fileInput.files[0];
+  
+  if (!file) {
+    alert("Please select a file to upload.");
+    return;
+  }
+  
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert("File is too large. Maximum size is 5MB.");
+    return;
+  }
+  
+  // Validate file type
+  const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+  if (!validTypes.includes(file.type)) {
+    alert("Invalid file type. Please upload PDF, JPG, or PNG.");
+    return;
+  }
+  
+  // Show loading state
+  const uploadBtn = fileInput.nextElementSibling;
+  const originalText = uploadBtn.textContent;
+  uploadBtn.textContent = 'Uploading...';
+  uploadBtn.disabled = true;
+  
+  // Simulate upload process
+  setTimeout(() => {
+    // In a real application, you would upload the file to a server here
+    // For now, we'll just simulate success
+    
+    // Update order with payment proof status
+    const orders = JSON.parse(localStorage.getItem("orders"));
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    
+    if (orderIndex !== -1) {
+      orders[orderIndex].paymentProof = {
+        fileName: file.name,
+        uploadDate: new Date().toISOString(),
+        status: 'pending_verification'
+      };
+      
+      localStorage.setItem("orders", JSON.stringify(orders));
+      
+      alert("Payment proof uploaded successfully! We'll verify your payment within 24 hours.");
+      
+      // Close the modal
+      document.querySelector('.modal-overlay').remove();
+      
+      // Refresh orders list
+      loadOrders('pending');
+      
+      // Also refresh admin orders if open
+      if (adminCurrentTab === 'orders') {
+        adminRenderOrders();
+      }
+    }
+    
+    // Reset button
+    uploadBtn.textContent = originalText;
+    uploadBtn.disabled = false;
+    
+  }, 1500);
+}
+
+/* ---------- PREVIOUS FUNCTIONS (Search, Filter, Cart, etc.) ---------- */
+
+function performSearch() {
+  currentSearchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+  currentPage = 1;
+  renderMachines();
+}
+
+function filterByCategory(category) {
+  currentCategoryFilter = category;
+  currentPage = 1;
+  renderMachines();
+}
+
+// Removed filterByStatus function
+
+function populateCategoryFilter() {
+  const machines = JSON.parse(localStorage.getItem("machines"));
+  const filterSelect = document.getElementById('categoryFilter');
+  
+  const categories = new Set(machines.map(m => m.category));
+  
+  filterSelect.innerHTML = '';
+  
+  let optionsHTML = `<option value="All" ${'All' === currentCategoryFilter ? 'selected' : ''}>All Categories</option>`;
+  
+  categories.forEach(category => {
+    optionsHTML += `<option value="${category}" ${category === currentCategoryFilter ? 'selected' : ''}>${category}</option>`;
+  });
+
+  filterSelect.innerHTML = optionsHTML;
+}
+
+function getFilteredMachines() {
+  const machines = JSON.parse(localStorage.getItem("machines"));
+  
+  return machines.filter(machine => {
+    if (currentCategoryFilter !== 'All' && machine.category !== currentCategoryFilter) {
+      return false;
+    }
+    
+    if (currentSearchQuery) {
+      const searchableText = `
+        ${machine.name.toLowerCase()}
+        ${machine.category.toLowerCase()}
+        ${Object.values(machine.specs).join(' ').toLowerCase()}
+        ${machine.condition.toLowerCase()}
+      `;
+      
+      if (!searchableText.includes(currentSearchQuery)) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+}
+
+function renderMachines() {
+  const grid = document.getElementById("machineGrid");
+  const filteredMachines = getFilteredMachines();
+  const totalItems = filteredMachines.length;
+  
+  grid.innerHTML = "";
+
+  const searchResultsCount = document.getElementById('searchResultsCount');
+  if (currentSearchQuery) {
+    searchResultsCount.textContent = `Found ${totalItems} result${totalItems !== 1 ? 's' : ''} for "${currentSearchQuery}"`;
+    searchResultsCount.classList.remove('text-gray-600');
+    searchResultsCount.classList.add('text-industrial-blue', 'font-medium');
+  } else {
+    searchResultsCount.textContent = `Showing ${totalItems} piece${totalItems !== 1 ? 's' : ''} of equipment`;
+    searchResultsCount.classList.remove('text-industrial-blue', 'font-medium');
+    searchResultsCount.classList.add('text-gray-600');
+  }
+
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+  if (currentPage > totalPages && totalPages > 0) {
+    currentPage = totalPages;
+  } else if (totalPages === 0) {
+    currentPage = 1;
+  }
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+
+  const machinesToDisplay = filteredMachines.slice(startIndex, endIndex);
+
+  if (machinesToDisplay.length === 0) {
+    grid.innerHTML = `<div class="col-span-3 text-center py-12">
+        <div class="text-5xl mb-4">🔍</div>
+        <h3 class="font-heading text-xl font-bold text-gray-700 mb-2">No machinery found</h3>
+        <p class="text-gray-500">Try adjusting your search or filters</p>
+        <button onclick="clearFilters()" class="mt-4 bg-industrial-yellow hover:bg-orange-500 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200">
+          Clear All Filters
+        </button>
+      </div>`;
+  } else {
+    machinesToDisplay.forEach(m => {
+      grid.innerHTML += `
+        <div class="bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 animate-fade-in">
+          <div class="relative">
+            <img src="${m.image}" class="h-48 md:h-56 w-full object-cover" alt="${m.name}">
+            <span class="absolute top-4 right-4 px-3 py-1.5 rounded-full text-xs font-bold ${m.status === 'Available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+              ${m.status}
+            </span>
+            <span class="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-bold bg-industrial-gray/80 text-white backdrop-blur-sm">
+              ${m.category}
+            </span>
+          </div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-3">
+              <h3 class="font-heading font-bold text-lg md:text-xl text-industrial-gray">${m.name}</h3>
+              <div class="flex items-center space-x-1">
+                <span class="text-yellow-500">⭐</span>
+                <span class="font-semibold text-sm">${m.rating || 4.5}</span>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">${Object.entries(m.specs).slice(0,1).map(([k,v]) => `${k.replace(/([A-Z])/g," $1")}: ${v}`).join(" • ")}</p>
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="font-heading font-bold text-2xl text-industrial-yellow">$${m.price}<span class="text-sm text-gray-500 font-normal">/day</span></p>
+                <p class="text-xs text-gray-500 mt-1">Condition: ${m.condition}</p>
+                ${m.status === 'Rented' ? `<p class="text-xs text-red-500 mt-1">Available from: ${m.availableFrom}</p>` : ''}
+              </div>
+              <button onclick="openDetail(${m.id})"
+                class="bg-gradient-to-r from-industrial-yellow to-industrial-orange hover:from-orange-500 hover:to-red-500 text-white px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg">
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById('prevBtn').disabled = currentPage === 1;
+  document.getElementById('nextBtn').disabled = currentPage >= totalPages || totalPages === 0;
+  
+  const statusText = totalPages === 0 
+    ? "Page 0 of 0" 
+    : `Page ${currentPage} of ${totalPages}`;
+
+  document.getElementById('pageStatus').textContent = statusText;
+  document.getElementById('showingCount').textContent = machinesToDisplay.length;
+  document.getElementById('totalCount').textContent = totalItems;
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('categoryFilter').value = 'All';
+  currentSearchQuery = '';
+  currentCategoryFilter = 'All';
+  currentPage = 1;
+  renderMachines();
+}
+
+function changePage(direction) {
+  const filteredMachines = getFilteredMachines();
+  const totalPages = Math.ceil(filteredMachines.length / ITEMS_PER_PAGE);
+
+  const newPage = currentPage + direction;
+
+  if (newPage >= 1 && newPage <= totalPages) {
+    currentPage = newPage;
+    renderMachines();
+    window.scrollTo({ top: document.getElementById('machineGrid').offsetTop - 100, behavior: 'smooth' });
+  }
+}
+
+/* ---------- DETAIL MODAL ---------- */
+function openDetail(id) {
+  selectedId = id;
+  const m = JSON.parse(localStorage.getItem("machines")).find(x => x.id === id);
+  const isAvailable = m.status === "Available";
+  
+  let startDateValue = today;
+  let endDateValue = "";
+  
+  if (!isAvailable && m.availableFrom) {
+    startDateValue = m.availableFrom;
+    const startDate = new Date(startDateValue);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+    endDateValue = endDate.toISOString().split('T')[0];
+  } else {
+    const startDate = new Date(startDateValue);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+    endDateValue = endDate.toISOString().split('T')[0];
+  }
+
+  let buttonHTML = '';
+  if (isAvailable) {
+    buttonHTML = `
+      <button onclick="addToCart()" id="actionBtn" class="w-full py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-industrial-yellow to-industrial-orange hover:from-orange-500 hover:to-red-500 text-white transition-all duration-300 shadow-lg hover:shadow-xl">
+        Add to Cart
+      </button>`;
+  } else {
+    buttonHTML = `
+      <button onclick="addToWishlist()" id="actionBtn" class="w-full py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-industrial-blue to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl">
+        Add to Wishlist (Available from ${m.availableFrom})
+      </button>`;
+  }
+  
+  document.getElementById("detailContent").innerHTML = `
+    <img src="${m.image}" class="h-64 w-full object-cover rounded-2xl mb-6 shadow-lg" alt="${m.name}">
+    <div class="flex justify-between items-start mb-4">
+      <div>
+        <h2 class="font-heading text-2xl md:text-3xl font-bold text-industrial-gray">${m.name}</h2>
+        <div class="flex items-center space-x-3 mt-2">
+          <span class="px-3 py-1 rounded-full text-sm font-bold ${isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+            ${m.status}
+          </span>
+          <span class="px-3 py-1 rounded-full text-sm font-bold bg-gray-100 text-gray-800">
+            ${m.category}
+          </span>
+          <div class="flex items-center space-x-1">
+            <span class="text-yellow-500">⭐</span>
+            <span class="font-semibold">${m.rating || 4.5}</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="font-heading font-bold text-3xl text-industrial-yellow">$${m.price}<span class="text-base text-gray-500 font-normal">/day</span></p>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-gray-50 p-5 rounded-2xl">
+        <h3 class="font-heading text-lg font-bold mb-4 text-industrial-gray">Specifications</h3>
+        <div class="space-y-3">
+          ${Object.entries(m.specs).map(([k,v]) => `
+            <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+              <span class="font-medium text-gray-700 capitalize">${k.replace(/([A-Z])/g," $1")}</span>
+              <span class="font-semibold">${v}</span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+      
+      <div class="bg-gray-50 p-5 rounded-2xl">
+        <h3 class="font-heading text-lg font-bold mb-4 text-industrial-gray">Equipment Details</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+            <span class="font-medium text-gray-700">Condition</span>
+            <span class="font-semibold ${m.condition === 'Excellent' ? 'text-green-600' : 'text-yellow-600'}">${m.condition}</span>
+          </div>
+          <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+            <span class="font-medium text-gray-700">Last Service</span>
+            <span class="font-semibold">${m.lastService}</span>
+          </div>
+          ${!isAvailable ? `
+            <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+              <span class="font-medium text-gray-700">Available From</span>
+              <span class="font-semibold text-blue-600">${m.availableFrom}</span>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+    
+    <div class="mb-8">
+      <h3 class="font-heading text-lg font-bold mb-4 text-industrial-gray flex items-center">
+        <span class="text-red-500 mr-2">⚠️</span> Safety & Usage Instructions
+      </h3>
+      <div class="bg-red-50 border-l-4 border-industrial-safety p-4 rounded-r-xl">
+        <p class="text-gray-700">${m.safetyNotes}</p>
+      </div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-gray-50 to-white p-6 rounded-2xl border border-gray-200 mb-6">
+      <h3 class="font-heading text-lg font-bold mb-4 text-industrial-gray">Rental Details</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block font-medium text-gray-700 mb-2">Start Date</label>
+          <input id="startDate" type="date" 
+            value="${startDateValue}"
+            min="${isAvailable ? today : m.availableFrom}"
+            class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200">
+        </div>
+        <div>
+          <label class="block font-medium text-gray-700 mb-2">End Date</label>
+          <input id="endDate" type="date" 
+            value="${endDateValue}"
+            min="${startDateValue}"
+            class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200">
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block font-medium text-gray-700 mb-2">Quantity</label>
+          <input id="qty" type="number" min="1" value="1" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-industrial-yellow focus:ring-2 focus:ring-industrial-yellow/30 focus:outline-none transition-all duration-200">
+        </div>
+        <div class="flex items-end">
+          <div class="w-full bg-white p-4 rounded-xl border-2 border-gray-100">
+            <p class="text-sm text-gray-600 mb-1">Estimated Total</p>
+            <p class="font-heading font-bold text-2xl text-industrial-yellow" id="price">$0</p>
+          </div>
+        </div>
+      </div>
+      <p id="dateError" class="text-red-500 hidden mt-3 text-sm">
+        End date must be after the start date.
+      </p>
+    </div>
+    ${buttonHTML}
+  `;
+
+  document.getElementById("startDate").addEventListener("change", function() {
+    const startDate = this.value;
+    const endDateInput = document.getElementById("endDate");
+    endDateInput.min = startDate;
+    
+    if (endDateInput.value && endDateInput.value < startDate) {
+      const newEndDate = new Date(startDate);
+      newEndDate.setDate(newEndDate.getDate() + 1);
+      endDateInput.value = newEndDate.toISOString().split('T')[0];
+    }
+    
+    updatePrice(m.price);
+  });
+
+  ["endDate", "qty"].forEach(id =>
+    document.getElementById(id).addEventListener("change", () => updatePrice(m.price))
+  );
+
+  updatePrice(m.price);
+  document.getElementById("detailModal").classList.remove("hidden");
+}
+
+function closeDetail() {
+  document.getElementById("detailModal").classList.add("hidden");
+}
+
+function getDays() {
+  const sInput = document.getElementById("startDate");
+  const eInput = document.getElementById("endDate");
+  const dateError = document.getElementById("dateError");
+  const actionBtn = document.getElementById("actionBtn");
+  
+  const s = new Date(sInput.value);
+  const e = new Date(eInput.value);
+  
+  const m = JSON.parse(localStorage.getItem("machines")).find(x => x.id === selectedId);
+  const isAvailable = m.status === "Available";
+
+  if (!sInput.value || !eInput.value || e <= s) {
+    if (sInput.value && eInput.value) {
+      dateError.classList.remove("hidden");
+      if(isAvailable && actionBtn) actionBtn.disabled = true;
+    }
+    return 0;
+  }
+  
+  dateError.classList.add("hidden");
+  if(isAvailable && actionBtn) actionBtn.disabled = false;
+  
+  return Math.ceil((e - s) / (1000 * 60 * 60 * 24));
+}
+
+function updatePrice(price) {
+  const days = getDays();
+  const qty = parseInt(document.getElementById("qty").value) || 0;
+  
+  const total = price * days * qty;
+  document.getElementById("price").textContent = total > 0 ? `$${total}` : "$0";
+}
+
+function addToCart() {
+  const cart = JSON.parse(localStorage.getItem("cart"));
+  const days = getDays();
+  const qtyInput = document.getElementById("qty");
+  const qty = parseInt(qtyInput.value);
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+
+  if (days <= 0) {
+    alert("Please select valid rental dates (End Date must be after Start Date).");
+    return;
+  }
+  
+  if (qty <= 0) {
+    alert("Quantity must be at least 1.");
+    return;
+  }
+
+  const existing = cart.find(i => i.machineId === selectedId);
+  if (existing) {
+    existing.quantity += qty;
+    existing.days = days;
+    existing.startDate = startDate;
+    existing.endDate = endDate;
+  } else {
+    cart.push({ 
+      machineId: selectedId, 
+      quantity: qty, 
+      days, 
+      startDate: startDate, 
+      endDate: endDate 
+    });
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  closeDetail();
+  updateNavigationBadges();
+}
+
+function addToWishlist() {
+  const wishlist = JSON.parse(localStorage.getItem("wishlist"));
+  const m = JSON.parse(localStorage.getItem("machines")).find(x => x.id === selectedId);
+  
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+  const qty = parseInt(document.getElementById("qty").value) || 1;
+
+  const existingIndex = wishlist.findIndex(item => item.machineId === selectedId);
+  
+  if (existingIndex !== -1) {
+    wishlist[existingIndex] = {
+      machineId: selectedId,
+      startDate: startDate,
+      endDate: endDate,
+      quantity: qty,
+      addedDate: new Date().toISOString().split('T')[0],
+      availableFrom: m.availableFrom
+    };
+  } else {
+    wishlist.push({
+      machineId: selectedId,
+      startDate: startDate,
+      endDate: endDate,
+      quantity: qty,
+      addedDate: new Date().toISOString().split('T')[0],
+      availableFrom: m.availableFrom
+    });
+  }
+
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  closeDetail();
+  updateNavigationBadges();
+  
+  alert(`Added to wishlist! You'll be notified when this item is available from ${m.availableFrom}.`);
+}
+
+function openCart() {
+  const cart = JSON.parse(localStorage.getItem("cart"));
+  const machines = JSON.parse(localStorage.getItem("machines"));
+  let total = 0;
+  const cartItems = document.getElementById("cartItems");
+  cartItems.innerHTML = "";
+
+  if (cart.length === 0) {
+    cartItems.innerHTML = `<div class="text-center py-12">
+      <div class="text-6xl mb-4">🛒</div>
+      <h3 class="font-heading text-xl font-bold text-gray-700 mb-2">Your cart is empty</h3>
+      <p class="text-gray-500">Add machinery to get started</p>
+    </div>`;
+    document.getElementById("cartModal").classList.remove("hidden");
+    return;
+  }
+
+  cart.forEach((item, i) => {
+    const m = machines.find(x => x.id === item.machineId);
+    const cost = m.price * item.quantity * item.days;
+    total += cost;
+
+    cartItems.innerHTML += `
+      <div class="border border-gray-200 rounded-2xl p-5 mb-4 bg-gradient-to-r from-gray-50 to-white">
+        <div class="flex flex-col md:flex-row md:items-center justify-between">
+          <div class="flex-1 mb-4 md:mb-0">
+            <div class="flex items-start space-x-4">
+              <img src="${m.image}" class="h-16 w-16 object-cover rounded-xl" alt="${m.name}">
+              <div>
+                <p class="font-heading font-bold text-lg text-industrial-gray">${m.name}</p>
+                <p class="text-sm text-gray-600">${item.startDate} to ${item.endDate}</p>
+                <div class="flex items-center space-x-4 mt-2">
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Quantity</p>
+                    <input type="number" value="${item.quantity}" min="1"
+                      onchange="updateCart(${i}, this.value, ${item.days})"
+                      class="border-2 border-gray-200 w-20 text-center p-2 rounded-lg focus:border-industrial-yellow focus:outline-none">
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Days</p>
+                    <input type="number" value="${item.days}" min="1"
+                      onchange="updateCart(${i}, ${item.quantity}, this.value)"
+                      class="border-2 border-gray-200 w-20 text-center p-2 rounded-lg focus:border-industrial-yellow focus:outline-none">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-col items-end">
+            <p class="font-heading font-bold text-xl text-industrial-yellow mb-2">$${cost}</p>
+            <button onclick="removeFromCart(${i})" class="text-red-600 hover:text-red-800 text-sm py-2 px-4 rounded-lg border border-red-200 hover:border-red-300 bg-red-50 hover:bg-red-100 transition-colors duration-200">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("cartTotal").textContent = "$" + total;
+  document.getElementById("cartModal").classList.remove("hidden");
+}
+
+function closeCart() {
+  document.getElementById("cartModal").classList.add("hidden");
+}
+
+function updateCart(i, qty, days) {
+  const cart = JSON.parse(localStorage.getItem("cart"));
+  cart[i].quantity = parseInt(qty);
+  cart[i].days = parseInt(days);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  openCart();
+}
+
+function removeFromCart(index) {
+  const cart = JSON.parse(localStorage.getItem("cart"));
+  cart.splice(index, 1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateNavigationBadges();
+  openCart();
+}
+
+function openWishlist() {
+  const wishlist = JSON.parse(localStorage.getItem("wishlist"));
+  const machines = JSON.parse(localStorage.getItem("machines"));
+  const wishlistItems = document.getElementById("wishlistItems");
+  wishlistItems.innerHTML = "";
+
+  if (wishlist.length === 0) {
+    wishlistItems.innerHTML = `<div class="text-center py-12">
+      <div class="text-6xl mb-4">💛</div>
+      <h3 class="font-heading text-xl font-bold text-gray-700 mb-2">Your wishlist is empty</h3>
+      <p class="text-gray-500">Add unavailable items to be notified when they're back</p>
+    </div>`;
+    document.getElementById("wishlistModal").classList.remove("hidden");
+    return;
+  }
+  
+  wishlist.forEach((item, i) => {
+    const m = machines.find(x => x.id === item.machineId);
+    if (!m) return;
+
+    wishlistItems.innerHTML += `
+      <div class="border border-gray-200 rounded-2xl p-5 mb-4 bg-gradient-to-r from-gray-50 to-white">
+        <div class="flex flex-col md:flex-row md:items-center justify-between">
+          <div class="flex-1 mb-4 md:mb-0">
+            <div class="flex items-center space-x-4">
+              <img src="${m.image}" class="h-16 w-16 object-cover rounded-xl" alt="${m.name}">
+              <div>
+                <p class="font-heading font-bold text-lg text-industrial-gray">${m.name}</p>
+                <p class="text-sm text-gray-600">${m.category} - $${m.price}/day</p>
+                <div class="flex items-center space-x-4 mt-2">
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Requested Dates</p>
+                    <p class="text-sm font-medium">${item.startDate} to ${item.endDate}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Quantity</p>
+                    <p class="text-sm font-medium">${item.quantity}</p>
+                  </div>
+                </div>
+                <p class="text-xs text-blue-500 font-semibold mt-2">Will be available from: ${item.availableFrom || m.availableFrom}</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 md:mt-0">
+            <button onclick="removeFromWishlist(${i})" class="text-red-600 hover:text-red-800 text-sm py-2 px-4 rounded-lg border border-red-200 hover:border-red-300 bg-red-50 hover:bg-red-100 transition-colors duration-200">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("wishlistModal").classList.remove("hidden");
+}
+
+function removeFromWishlist(index) {
+  const wishlist = JSON.parse(localStorage.getItem("wishlist"));
+  wishlist.splice(index, 1);
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  updateNavigationBadges();
+  openWishlist();
+}
+
+function closeWishlist() {
+  document.getElementById("wishlistModal").classList.add("hidden");
+}
+
+function closeConfirm() {
+  document.getElementById("confirmModal").classList.add("hidden");
+}
+
+/* ---------- SYNC ---------- */
+window.addEventListener("storage", e => {
+  if (e.key === "machines") {
+    populateCategoryFilter();
+    renderMachines();
+    if (adminCurrentTab === 'inventory' || adminCurrentTab === 'dashboard') {
+      adminRenderInventory();
+      adminRenderDashboard();
+    }
+  }
+  if (e.key === "orders") {
+    if (adminCurrentTab === 'orders' || adminCurrentTab === 'dashboard') {
+      adminRenderOrders();
+      adminRenderDashboard();
+    }
+  }
+});
+
+/* ---------- INIT ---------- */
+document.addEventListener('DOMContentLoaded', function() {
+  populateCategoryFilter();
+  renderMachines();
+  updateNavigationBadges();
+  checkAdminAuthentication();
+  
+  // Touch optimization for mobile
+  document.addEventListener('touchstart', function() {}, {passive: true});
+  
+  // Add keyboard shortcut for search (Ctrl/Cmd + F)
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+      e.preventDefault();
+      document.getElementById('searchInput').focus();
+    }
+    // Escape key to close modals
+    if (e.key === 'Escape') {
+      closeDetail();
+      closeCart();
+      closeCompleteBookingModal();
+      closeOrders();
+      closeWishlist();
+      closeConfirm();
+      closeAdminMachineForm();
+      closeAdminOrderDetails();
+    }
+  });
+});
+</script>
+
+</body>
+</html>
