@@ -281,13 +281,25 @@ function renderPending() {
 function updatePendingBadge() {
     const count = STATE.users.filter(u => u.status === 'Pending').length;
     const badge = document.getElementById('pending-badge');
+    const headerBadge = document.getElementById('header-pending-badge');
 
+    // Update sidebar badge
     if (badge) {
         if (count > 0) {
             badge.textContent = count;
             badge.classList.remove('hidden');
         } else {
             badge.classList.add('hidden');
+        }
+    }
+
+    // Update header badge
+    if (headerBadge) {
+        if (count > 0) {
+            headerBadge.textContent = count;
+            headerBadge.classList.remove('hidden');
+        } else {
+            headerBadge.classList.add('hidden');
         }
     }
 }
@@ -496,8 +508,16 @@ window.deleteUser = (id) => {
     if (confirm('Are you sure you want to delete this user?')) {
         STATE.users = STATE.users.filter(u => u.id !== id);
         saveData();
+
+        // Auto-refresh all views
         renderUsers();
+        renderPending();
         updateMapMarkers();
+        updatePendingBadge();
+        updateStats();
+
+        // Show notification
+        showNotification('User Deleted', 'The user has been removed from the system.', 'info');
     }
 };
 
@@ -505,19 +525,19 @@ window.approveUser = (id) => {
     const user = STATE.users.find(u => u.id === id);
     if (!user) return;
 
-    if (confirm(`Approve ${user.name} as a ${user.role}?`)) {
-        user.status = 'Active';
-        saveData();
-        renderUsers();
-        updateMapMarkers();
+    // Approve without confirmation for faster workflow
+    user.status = 'Active';
+    saveData();
 
-        // Show success notification
-        const toast = document.createElement('div');
-        toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-xl z-50 transform transition-all slide-in';
-        toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${user.name} approved!`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
+    // Auto-refresh all views
+    renderUsers();
+    renderPending();
+    updateMapMarkers();
+    updatePendingBadge();
+    updateStats();
+
+    // Show success notification
+    showNotification('Partner Approved!', `${user.name} has been approved and can now login.`, 'success');
 };
 
 // Map Visualization (Ethiopia Focused)

@@ -278,6 +278,17 @@
         </div>
       </div>
       <div class="space-x-4 flex items-center">
+        <!-- Partner Info -->
+        <div class="text-right hidden md:block">
+          <p class="text-sm font-medium partner-name">Partner</p>
+          <p class="text-xs text-gray-300 partner-company">Company</p>
+        </div>
+        <div class="w-10 h-10 bg-industrial-yellow rounded-full flex items-center justify-center">
+          <i class="fas fa-user text-industrial-gray"></i>
+        </div>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-medium transition">
+          <i class="fas fa-sign-out-alt mr-2"></i>Logout
+        </button>
         <div class="hidden md:flex items-center space-x-2 text-sm bg-gray-700 px-3 py-1 rounded-lg">
           <i class="fas fa-user-shield"></i>
           <span>Administrator</span>
@@ -1857,9 +1868,8 @@
       const password = document.getElementById('password').value;
       const loginError = document.getElementById('loginError');
 
-      // Super Admin hardcoded login
+      // Super Admin hardcoded login - redirect to super admin dashboard
       if (username === 'admin' && password === 'pass123') {
-        // Redirect to super admin dashboard
         window.location.href = 'super_admin_dashboard.html';
         return;
       }
@@ -1889,11 +1899,33 @@
         return;
       }
 
-      // Successful login - store session and show dashboard
+      // Successful login - store session and show admin content (STAY ON admin.html)
       localStorage.setItem('current_admin_user', JSON.stringify(user));
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('adminContent').classList.remove('hidden');
       loginError.classList.add('hidden');
+
+      // Update UI with partner name
+      updatePartnerInfo();
+    }
+
+    function updatePartnerInfo() {
+      const userStr = localStorage.getItem('current_admin_user');
+      if (!userStr) return;
+
+      const user = JSON.parse(userStr);
+
+      // Update any elements that should show partner name
+      const partnerNameElements = document.querySelectorAll('.partner-name');
+      partnerNameElements.forEach(el => {
+        el.textContent = user.name;
+      });
+
+      // Update company name if exists
+      const companyElements = document.querySelectorAll('.partner-company');
+      companyElements.forEach(el => {
+        el.textContent = user.company || '';
+      });
     }
 
     function checkAuthentication() {
@@ -1902,6 +1934,7 @@
       if (currentUser) {
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('adminContent').classList.remove('hidden');
+        updatePartnerInfo();
       }
     }
 

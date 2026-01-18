@@ -174,7 +174,11 @@
                 <i class="fas fa-bars"></i>
             </button>
             <span class="font-heading font-bold text-lg">Super Admin</span>
-            <div class="w-8"></div> <!-- Spacer -->
+            <button onclick="showSection('pending')" class="relative text-industrial-gray text-xl">
+                <i class="fas fa-bell"></i>
+                <span id="header-pending-badge"
+                    class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">0</span>
+            </button>
         </header>
 
         <!-- Content Area -->
