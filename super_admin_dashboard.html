@@ -114,6 +114,18 @@
                     </button>
                 </li>
                 <li>
+                    <button onclick="showSection('pending')"
+                        class="nav-item w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-left"
+                        data-target="pending">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-user-clock w-5"></i>
+                            <span>Pending Approvals</span>
+                        </div>
+                        <span id="pending-badge"
+                            class="hidden bg-industrial-yellow text-industrial-dark text-xs font-bold px-2 py-1 rounded-full">0</span>
+                    </button>
+                </li>
+                <li>
                     <button onclick="showSection('map')"
                         class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-left"
                         data-target="map">
@@ -185,31 +197,31 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-white p-5 rounded-2xl shadow-card border-l-4 border-industrial-blue">
                         <div class="flex justify-between items-start">
-                            <span class="text-gray-500 text-sm font-bold uppercase">Total Users</span>
-                            <i class="fas fa-users text-industrial-blue text-xl opacity-50"></i>
+                            <span class="text-gray-500 text-sm font-bold uppercase">Rental Machines</span>
+                            <i class="fas fa-truck-moving text-industrial-blue text-xl opacity-50"></i>
                         </div>
-                        <p class="text-3xl font-heading font-bold mt-2" id="stat-total-users">0</p>
+                        <p class="text-3xl font-heading font-bold mt-2" id="stat-rental-machines">0</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-card border-l-4 border-industrial-green">
                         <div class="flex justify-between items-start">
-                            <span class="text-gray-500 text-sm font-bold uppercase">Active Renters</span>
-                            <i class="fas fa-hard-hat text-industrial-green text-xl opacity-50"></i>
+                            <span class="text-gray-500 text-sm font-bold uppercase">Sale Machines</span>
+                            <i class="fas fa-shopping-cart text-industrial-green text-xl opacity-50"></i>
                         </div>
-                        <p class="text-3xl font-heading font-bold mt-2" id="stat-active-renters">0</p>
+                        <p class="text-3xl font-heading font-bold mt-2" id="stat-sale-machines">0</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-card border-l-4 border-industrial-yellow">
                         <div class="flex justify-between items-start">
-                            <span class="text-gray-500 text-sm font-bold uppercase">Pending Verif.</span>
-                            <i class="fas fa-clock text-industrial-yellow text-xl opacity-50"></i>
+                            <span class="text-gray-500 text-sm font-bold uppercase">Partner Accounts</span>
+                            <i class="fas fa-handshake text-industrial-yellow text-xl opacity-50"></i>
                         </div>
-                        <p class="text-3xl font-heading font-bold mt-2">3</p>
+                        <p class="text-3xl font-heading font-bold mt-2" id="stat-total-partners">0</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-card border-l-4 border-industrial-safety">
                         <div class="flex justify-between items-start">
-                            <span class="text-gray-500 text-sm font-bold uppercase">Revenue</span>
-                            <i class="fas fa-coins text-industrial-safety text-xl opacity-50"></i>
+                            <span class="text-gray-500 text-sm font-bold uppercase">Pending Approvals</span>
+                            <i class="fas fa-user-clock text-industrial-safety text-xl opacity-50"></i>
                         </div>
-                        <p class="text-3xl font-heading font-bold mt-2" id="stat-revenue">$0</p>
+                        <p class="text-3xl font-heading font-bold mt-2" id="stat-pending-partners">0</p>
                     </div>
                 </div>
 
@@ -228,7 +240,6 @@
                                 <option value="All">All Roles</option>
                                 <option value="Customer">Customer</option>
                                 <option value="Partner">Partner</option>
-                                <option value="Admin">Admin</option>
                             </select>
                         </div>
                     </div>
@@ -251,6 +262,43 @@
                     </div>
                     <div class="p-4 border-t border-gray-100 flex justify-center">
                         <!-- Pagination placeholders -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pending Approvals Section -->
+            <section id="pending-section" class="hidden space-y-6 animate-fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-3xl font-heading font-bold text-industrial-gray">Pending Approvals</h2>
+                        <p class="text-gray-500">Review and approve new partner applications.</p>
+                    </div>
+                    <button onclick="refreshPending()"
+                        class="bg-industrial-blue text-white px-4 py-2 rounded-xl font-medium shadow hover:bg-blue-600 transition">
+                        <i class="fas fa-sync-alt mr-2"></i> Refresh
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-card overflow-hidden border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-orange-50 text-orange-700 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-semibold">Applicant</th>
+                                    <th class="p-4 font-semibold">Company</th>
+                                    <th class="p-4 font-semibold">Email</th>
+                                    <th class="p-4 font-semibold">Request Date</th>
+                                    <th class="p-4 font-semibold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingTableBody" class="divide-y divide-gray-100 text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="noPendingMsg" class="hidden text-center py-12 text-gray-400">
+                        <i class="fas fa-check-circle text-5xl mb-3 text-gray-200"></i>
+                        <p class="text-lg">No pending approvals at this time.</p>
                     </div>
                 </div>
             </section>

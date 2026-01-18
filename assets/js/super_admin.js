@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initCharts();
     renderUsers();
     updateStats();
+    updatePendingBadge(); // Initialize pending badge
     startPolling();
 
     // Event Listeners
@@ -78,11 +79,34 @@ function saveData() {
 }
 
 function startPolling() {
-    // Poll for new orders every 5 seconds
+    // Track last known pending count
+    let lastPendingCount = STATE.users.filter(u => u.status === 'Pending').length;
+
+    // Poll for new orders and signups every 3 seconds
     setInterval(async () => {
-        const hasChanges = checkForNewOrders();
-        if (hasChanges) {
-            saveData(); // Triggers UI update via updateStats/Charts
+        const hasOrderChanges = checkForNewOrders();
+
+        // Check for new partner signups
+        const reloadedUsers = JSON.parse(localStorage.getItem('super_admin_users') || '[]');
+        const newPendingCount = reloadedUsers.filter(u => u.status === 'Pending').length;
+
+        if (newPendingCount > lastPendingCount) {
+            // New signup detected!
+            STATE.users = reloadedUsers;
+            lastPendingCount = newPendingCount;
+
+            // Show notification
+            showNotification('New Partner Application!', `You have ${newPendingCount} pending approval${newPendingCount > 1 ? 's' : ''}.`, 'info');
+
+            // Update UI
+            updatePendingBadge();
+            renderPending();
+            renderUsers();
+            updateStats();
+        }
+
+        if (hasOrderChanges) {
+            saveData();
             renderUsers();
             updateMapMarkers();
 
@@ -98,6 +122,28 @@ function startPolling() {
                 setTimeout(() => toast.remove(), 500);
             }, 3000);
         }
+    }, 3000);
+}
+
+function showNotification(title, message, type = 'info') {
+    const toast = document.createElement('div');
+    const bgColor = type === 'info' ? 'bg-industrial-yellow' : 'bg-green-500';
+    toast.className = `fixed bottom-4 right-4 ${bgColor} text-white px-6 py-4 rounded-xl shadow-xl transform transition-all duration-500 translate-y-20 z-50 max-w-sm`;
+    toast.innerHTML = `
+        <div class="flex items-start space-x-3">
+            <i class="fas fa-bell text-xl"></i>
+            <div>
+                <div class="font-bold">${title}</div>
+                <div class="text-sm opacity-90">${message}</div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => toast.classList.remove('translate-y-20'));
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-20');
+        setTimeout(() => toast.remove(), 500);
     }, 5000);
 }
 
@@ -157,7 +203,7 @@ function checkForNewOrders() {
 
 // Navigation
 window.showSection = (sectionId) => {
-    ['users-section', 'map-section', 'analytics-section'].forEach(id => {
+    ['users-section', 'map-section', 'analytics-section', 'pending-section'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
 
@@ -176,8 +222,75 @@ window.showSection = (sectionId) => {
             STATE.map.invalidateSize();
             updateMapMarkers();
         }, 100);
+    } else if (sectionId === 'pending') {
+        renderPending();
+    } else if (sectionId === 'analytics') {
+        updateAnalyticsCharts();
     }
 };
+
+window.refreshPending = () => {
+    renderPending();
+    const btn = event.target.closest('button');
+    const icon = btn?.querySelector('i');
+    if (icon) {
+        icon.classList.add('fa-spin');
+        setTimeout(() => icon.classList.remove('fa-spin'), 1000);
+    }
+};
+
+function renderPending() {
+    const tbody = document.getElementById('pendingTableBody');
+    const noMsg = document.getElementById('noPendingMsg');
+    const pendingUsers = STATE.users.filter(u => u.status === 'Pending');
+
+    if (pendingUsers.length === 0) {
+        tbody.innerHTML = '';
+        noMsg.classList.remove('hidden');
+    } else {
+        noMsg.classList.add('hidden');
+        tbody.innerHTML = pendingUsers.map(user => `
+            <tr class="hover:bg-orange-50/30 transition-colors">
+                <td class="p-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
+                            ${user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="font-medium text-gray-800">${user.name}</div>
+                    </div>
+                </td>
+                <td class="p-4 text-gray-700">${user.company || 'N/A'}</td>
+                <td class="p-4 text-gray-600">${user.email}</td>
+                <td class="p-4 text-gray-500">${user.joinDate}</td>
+                <td class="p-4 text-right">
+                    <div class="flex justify-end space-x-2">
+                        <button onclick="approveUser(${user.id})" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm shadow transition">
+                            <i class="fas fa-check mr-1"></i> Approve
+                        </button>
+                        <button onclick="deleteUser(${user.id})" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium text-sm transition">
+                            <i class="fas fa-times mr-1"></i> Reject
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+    updatePendingBadge();
+}
+
+function updatePendingBadge() {
+    const count = STATE.users.filter(u => u.status === 'Pending').length;
+    const badge = document.getElementById('pending-badge');
+
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+}
 
 // User Management (CRUD)
 function renderUsers() {
@@ -222,15 +335,24 @@ function renderUsers() {
             </td>
             <td class="p-4 text-right">
                 <div class="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onclick="viewHistory(${user.id})" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg" title="Rental History">
-                        <i class="fas fa-history"></i>
-                    </button>
-                    <button onclick="editUser(${user.id})" class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteUser(${user.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Delete">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+                    ${user.status === 'Pending' ? `
+                        <button onclick="approveUser(${user.id})" class="p-2 text-green-600 hover:bg-green-50 rounded-lg font-bold text-xs" title="Approve">
+                            <i class="fas fa-check-circle mr-1"></i>Approve
+                        </button>
+                        <button onclick="deleteUser(${user.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Reject">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    ` : `
+                        <button onclick="viewHistory(${user.id})" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg" title="Rental History">
+                            <i class="fas fa-history"></i>
+                        </button>
+                        <button onclick="editUser(${user.id})" class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteUser(${user.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    `}
                 </div>
             </td>
         </tr>
@@ -379,6 +501,25 @@ window.deleteUser = (id) => {
     }
 };
 
+window.approveUser = (id) => {
+    const user = STATE.users.find(u => u.id === id);
+    if (!user) return;
+
+    if (confirm(`Approve ${user.name} as a ${user.role}?`)) {
+        user.status = 'Active';
+        saveData();
+        renderUsers();
+        updateMapMarkers();
+
+        // Show success notification
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-xl z-50 transform transition-all slide-in';
+        toast.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${user.name} approved!`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+};
+
 // Map Visualization (Ethiopia Focused)
 function initMap() {
     STATE.map = L.map('map').setView([9.145, 40.489], 6); // Center of Ethiopia
@@ -481,6 +622,45 @@ function updateCharts() {
     }
 }
 
+function updateAnalyticsCharts() {
+    // Get data from localStorage
+    const machinesData = localStorage.getItem('machines');
+    let rentalCount = 0;
+    let saleCount = 0;
+
+    if (machinesData) {
+        const machines = JSON.parse(machinesData);
+        rentalCount = machines.filter(m => m.listingType === 'Rent').length;
+        saleCount = machines.filter(m => m.listingType === 'Sale').length;
+    }
+
+    const vendorCount = STATE.users.filter(u => u.role === 'Partner' && u.status === 'Active').length;
+
+    // Update Equipment Status Chart (show Rental vs Sale Machines)
+    if (STATE.charts.equipment) {
+        STATE.charts.equipment.data.labels = ['Rental Machines', 'Sale Machines'];
+        STATE.charts.equipment.data.datasets[0].data = [rentalCount, saleCount];
+        STATE.charts.equipment.data.datasets[0].backgroundColor = ['#4299E1', '#10B981'];
+        STATE.charts.equipment.options.plugins = {
+            legend: { position: 'bottom' },
+            title: { display: true, text: 'Machines by Type' }
+        };
+        STATE.charts.equipment.update();
+    }
+
+    // Update User Growth Chart to show Vendors
+    if (STATE.charts.growth) {
+        STATE.charts.growth.data.labels = ['Active Vendors'];
+        STATE.charts.growth.data.datasets[0].label = 'Active Partners';
+        STATE.charts.growth.data.datasets[0].data = [vendorCount];
+        STATE.charts.growth.data.datasets[0].backgroundColor = '#FFB347';
+        STATE.charts.growth.options.scales = {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        };
+        STATE.charts.growth.update();
+    }
+}
+
 
 // Rental History / Interactions
 window.viewHistory = (userId) => {
@@ -529,8 +709,30 @@ window.closeRentalModal = (e, force = false) => {
 
 // Analytics / Stats
 function updateStats() {
-    document.getElementById('stat-total-users').innerText = STATE.users.length;
-    document.getElementById('stat-active-renters').innerText = STATE.interactions.filter(i => i.status === 'Active').length;
-    const totalRevenue = STATE.interactions.reduce((sum, item) => sum + (Number(item.cost) || 0), 0);
-    if (revenueDisplay) revenueDisplay.innerText = `$${totalRevenue.toLocaleString()}`;
+    // Get machines from localStorage (populated by main site)
+    const machinesData = localStorage.getItem('machines');
+    let rentalCount = 0;
+    let saleCount = 0;
+
+    if (machinesData) {
+        const machines = JSON.parse(machinesData);
+        rentalCount = machines.filter(m => m.listingType === 'Rent').length;
+        saleCount = machines.filter(m => m.listingType === 'Sale').length;
+    }
+
+    // Count partners
+    const partnerCount = STATE.users.filter(u => u.role === 'Partner' && u.status === 'Active').length;
+    const pendingCount = STATE.users.filter(u => u.status === 'Pending').length;
+
+    // Update stats
+    const rentalEl = document.getElementById('stat-rental-machines');
+    const saleEl = document.getElementById('stat-sale-machines');
+    const partnerEl = document.getElementById('stat-total-partners');
+    const pendingEl = document.getElementById('stat-pending-partners');
+
+    if (rentalEl) rentalEl.innerText = rentalCount;
+    if (saleEl) saleEl.innerText = saleCount;
+    if (partnerEl) partnerEl.innerText = partnerCount;
+    if (pendingEl) pendingEl.innerText = pendingCount;
 }
+

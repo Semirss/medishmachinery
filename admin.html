@@ -190,6 +190,13 @@
         </button>
       </form>
 
+      <div class="mt-4 text-center">
+        <a href="signup.html"
+          class="text-sm text-industrial-blue hover:text-industrial-yellow font-semibold transition-colors">
+          <i class="fas fa-user-plus mr-1"></i> Become a Partner
+        </a>
+      </div>
+
       <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
         <div class="flex items-start">
           <i class="fas fa-exclamation-triangle text-yellow-500 mt-0.5 mr-2"></i>
@@ -1842,7 +1849,68 @@
       document.getElementById('orderDetailsModal').classList.add('hidden');
     }
 
-    // ========== INITIALIZATION ==========
+    // ========== AUTHENTICATION ==========
+    function login(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const loginError = document.getElementById('loginError');
+
+      // Super Admin hardcoded login
+      if (username === 'admin' && password === 'pass123') {
+        // Redirect to super admin dashboard
+        window.location.href = 'super_admin_dashboard.html';
+        return;
+      }
+
+      // Partner login (check against localStorage)
+      const users = JSON.parse(localStorage.getItem('super_admin_users') || '[]');
+      const user = users.find(u => u.email === username && u.password === password && u.role === 'Partner');
+
+      if (!user) {
+        // Invalid credentials
+        loginError.querySelector('span').textContent = 'Invalid username or password. Please try again.';
+        loginError.classList.remove('hidden');
+        return;
+      }
+
+      // Check if user is pending approval
+      if (user.status === 'Pending') {
+        loginError.querySelector('span').textContent = 'Your account is pending admin approval. Please wait for activation.';
+        loginError.classList.remove('hidden');
+        return;
+      }
+
+      // Check if user is active
+      if (user.status !== 'Active') {
+        loginError.querySelector('span').textContent = 'Your account is not active. Please contact the administrator.';
+        loginError.classList.remove('hidden');
+        return;
+      }
+
+      // Successful login - store session and show dashboard
+      localStorage.setItem('current_admin_user', JSON.stringify(user));
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('adminContent').classList.remove('hidden');
+      loginError.classList.add('hidden');
+    }
+
+    function checkAuthentication() {
+      // Check if user is already logged in
+      const currentUser = localStorage.getItem('current_admin_user');
+      if (currentUser) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('adminContent').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('current_admin_user');
+      window.location.reload();
+    }
+
+    // ========== DATA INITIALIZATION ==========
     document.addEventListener('DOMContentLoaded', function () {
       initializeMachines();
       initializeOrders();
