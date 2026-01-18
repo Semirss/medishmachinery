@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin | Medish Machinery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'heading': ['Exo 2', 'sans-serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'industrial': {
+                            'yellow': '#FFB347',
+                            'orange': '#FF8C00',
+                            'gray': '#2D3748',
+                            'blue': '#4299E1',
+                            'safety': '#FF6B35',
+                            'green': '#10B981',
+                            'dark': '#1A202C'
+                        }
+                    },
+                    boxShadow: {
+                        'card': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .safety-stripes {
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 107, 53, 0.05) 10px, rgba(255, 107, 53, 0.05) 20px);
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .modal-overlay {
+            cursor: pointer;
+        }
+
+        .modal-content {
+            cursor: auto;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #FFB347;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF8C00;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-industrial-gray safety-stripes h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside
+        class="w-64 bg-industrial-dark text-white flex-shrink-0 flex flex-col transition-all duration-300 transform -translate-x-full md:translate-x-0 fixed md:relative z-30 h-full"
+        id="sidebar">
+        <div class="p-6 flex items-center space-x-3 border-b border-gray-700">
+            <div
+                class="w-8 h-8 bg-industrial-yellow rounded-lg flex items-center justify-center text-industrial-gray font-bold text-xl">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <h1 class="font-heading font-bold text-xl tracking-tight">Super<span
+                    class="text-industrial-yellow">Admin</span></h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 px-3">
+                <li>
+                    <button onclick="showSection('users')"
+                        class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-left"
+                        data-target="users">
+                        <i class="fas fa-users w-5"></i>
+                        <span>User Management</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('map')"
+                        class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-left"
+                        data-target="map">
+                        <i class="fas fa-map-marked-alt w-5"></i>
+                        <span>Live Locations</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('analytics')"
+                        class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-colors text-left"
+                        data-target="analytics">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span>Analytics</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="p-4 border-t border-gray-700">
+            <div class="flex items-center space-x-3 mb-4 px-2">
+                <div
+                    class="w-10 h-10 rounded-full bg-industrial-gray border-2 border-industrial-yellow overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name=Super+Admin&background=FFB347&color=2D3748" alt="Admin"
+                        class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <p class="font-bold text-sm">Super Admin</p>
+                    <p class="text-xs text-gray-400">System Owner</p>
+                </div>
+            </div>
+            <a href="index.html"
+                class="block w-full text-center py-2 bg-industrial-yellow text-industrial-gray font-bold rounded-lg hover:bg-orange-500 hover:text-white transition-colors">
+                Back to Site
+            </a>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <!-- Top Header for Mobile -->
+        <header class="bg-white shadow-sm py-3 px-4 flex items-center justify-between md:hidden z-10">
+            <button onclick="toggleSidebar()" class="text-industrial-gray text-xl">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="font-heading font-bold text-lg">Super Admin</span>
+            <div class="w-8"></div> <!-- Spacer -->
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-8" id="mainContent">
+
+            <!-- Users Section -->
+            <section id="users-section" class="space-y-6 animate-fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-3xl font-heading font-bold text-industrial-gray">User Management</h2>
+                        <p class="text-gray-500">Manage all registered users, renters, and partners.</p>
+                    </div>
+                    <button onclick="openUserModal()"
+                        class="bg-industrial-yellow hover:bg-industrial-orange text-white px-6 py-2.5 rounded-xl font-bold shadow-lg transition transform hover:-translate-y-1 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add New User
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-card border-l-4 border-industrial-blue">
+                        <div class="flex justify-between items-start">
+                            <span class="text-gray-500 text-sm font-bold uppercase">Total Users</span>
+                            <i class="fas fa-users text-industrial-blue text-xl opacity-50"></i>
+                        </div>
+                        <p class="text-3xl font-heading font-bold mt-2" id="stat-total-users">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-card border-l-4 border-industrial-green">
+                        <div class="flex justify-between items-start">
+                            <span class="text-gray-500 text-sm font-bold uppercase">Active Renters</span>
+                            <i class="fas fa-hard-hat text-industrial-green text-xl opacity-50"></i>
+                        </div>
+                        <p class="text-3xl font-heading font-bold mt-2" id="stat-active-renters">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-card border-l-4 border-industrial-yellow">
+                        <div class="flex justify-between items-start">
+                            <span class="text-gray-500 text-sm font-bold uppercase">Pending Verif.</span>
+                            <i class="fas fa-clock text-industrial-yellow text-xl opacity-50"></i>
+                        </div>
+                        <p class="text-3xl font-heading font-bold mt-2">3</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-card border-l-4 border-industrial-safety">
+                        <div class="flex justify-between items-start">
+                            <span class="text-gray-500 text-sm font-bold uppercase">Revenue</span>
+                            <i class="fas fa-coins text-industrial-safety text-xl opacity-50"></i>
+                        </div>
+                        <p class="text-3xl font-heading font-bold mt-2" id="stat-revenue">$0</p>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="bg-white rounded-2xl shadow-card overflow-hidden border border-gray-100">
+                    <div
+                        class="p-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="relative w-full sm:w-64">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            <input type="text" id="userListSearch" placeholder="Search users..."
+                                class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-industrial-yellow/50 transition-all">
+                        </div>
+                        <div class="flex space-x-2">
+                            <select id="userRoleFilter"
+                                class="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-industrial-yellow/50 bg-white cursor-pointer">
+                                <option value="All">All Roles</option>
+                                <option value="Customer">Customer</option>
+                                <option value="Partner">Partner</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-semibold">User info</th>
+                                    <th class="p-4 font-semibold">Role</th>
+                                    <th class="p-4 font-semibold">Status</th>
+                                    <th class="p-4 font-semibold">Balance</th>
+                                    <th class="p-4 font-semibold">Location</th>
+                                    <th class="p-4 font-semibold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody" class="divide-y divide-gray-100 text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t border-gray-100 flex justify-center">
+                        <!-- Pagination placeholders -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Map Section -->
+            <section id="map-section" class="hidden space-y-6 animate-fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h2 class="text-3xl font-heading font-bold text-industrial-gray">Live Locations</h2>
+                        <p class="text-gray-500">Real-time view of user locations and rental sites.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-card border border-gray-100 h-full">
+                    <div id="map" class="rounded-xl overflow-hidden shadow-inner h-[600px] w-full"></div>
+                </div>
+            </section>
+
+            <!-- Analytics Section (Real) -->
+            <section id="analytics-section" class="hidden space-y-6 animate-fade-in">
+                <div>
+                    <h2 class="text-3xl font-heading font-bold text-industrial-gray">System Analytics</h2>
+                    <p class="text-gray-500">Performance metrics and growth.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-card border border-gray-100">
+                        <h3 class="font-bold text-lg mb-4 text-industrial-gray">Revenue Overview</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-card border border-gray-100">
+                        <h3 class="font-bold text-lg mb-4 text-industrial-gray">User Growth</h3>
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-card border border-gray-100">
+                        <h3 class="font-bold text-lg mb-4 text-industrial-gray">Equipment Status</h3>
+                        <canvas id="equipmentStatusChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- User Modal (Create/Edit) -->
+    <div id="userModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 modal-overlay"
+        onclick="closeUserModal(event)">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden modal-content transform transition-all scale-95 opacity-0"
+            id="userModalContent">
+            <div class="bg-industrial-gray px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="font-heading font-bold text-lg" id="modalTitle">Add New User</h3>
+                <button onclick="closeUserModal(null, true)" class="hover:text-industrial-yellow transition"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <form id="userForm" onsubmit="handleUserSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="userId">
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="userName" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-industrial-yellow/50 focus:border-industrial-yellow outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Email Address</label>
+                    <input type="email" id="userEmail" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-industrial-yellow/50 focus:border-industrial-yellow outline-none transition">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Role</label>
+                        <select id="userRole"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-industrial-yellow/50 outline-none bg-white">
+                            <option value="Customer">Customer</option>
+                            <option value="Partner">Partner</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Status</label>
+                        <select id="userStatus"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-industrial-yellow/50 outline-none bg-white">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Banned">Banned</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Detailed Location (City/Site)</label>
+                    <input type="text" id="userLocationName" placeholder="Specific Site Name..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-industrial-yellow/50 outline-none transition mb-2">
+
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Region (Ethiopia Only)</label>
+                    <select id="userCitySelect" onchange="updateLatLongFromCity(this.value)"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-industrial-yellow/50 outline-none bg-white">
+                        <option value="">Select a City</option>
+                        <option value="Addis Ababa">Addis Ababa</option>
+                        <option value="Dire Dawa">Dire Dawa</option>
+                        <option value="Mekelle">Mekelle</option>
+                        <option value="Gondar">Gondar</option>
+                        <option value="Bahir Dar">Bahir Dar</option>
+                        <option value="Hawassa">Hawassa</option>
+                        <option value="Jimma">Jimma</option>
+                        <option value="Adama">Adama</option>
+                        <option value="Jijiga">Jijiga</option>
+                        <option value="Shashemene">Shashemene</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Lat</label>
+                        <input type="number" step="any" id="userLat" placeholder="0.00"
+                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-white" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Lng</label>
+                        <input type="number" step="any" id="userLng" placeholder="0.00"
+                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-white" readonly>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" onclick="closeUserModal(null, true)"
+                        class="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition">Cancel</button>
+                    <button type="submit"
+                        class="px-5 py-2 rounded-lg bg-industrial-yellow text-white font-bold hover:bg-orange-500 shadow-md transition">Save
+                        User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rental History Modal -->
+    <div id="rentalModal"
+        class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 modal-overlay"
+        onclick="closeRentalModal(event)">
+        <div
+            class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden modal-content animate-slide-up max-h-[85vh] flex flex-col">
+            <div class="bg-industrial-dark px-6 py-4 flex justify-between items-center text-white flex-shrink-0">
+                <div>
+                    <h3 class="font-heading font-bold text-lg" id="rentalModalTitle">Rental History</h3>
+                    <p class="text-xs text-gray-400" id="rentalModalSubtitle">John Doe</p>
+                </div>
+                <button onclick="closeRentalModal(null, true)" class="hover:text-industrial-yellow transition"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <div id="rentalHistoryContent" class="space-y-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- App Logic -->
+    <script src="assets/js/super_admin.js"></script>
+</body>
+
+</html>
