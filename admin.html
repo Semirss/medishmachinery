@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | MachineryHub</title>
+  <title>Admin Dashboard | Medish Machinery</title>
   <!-- Using local Tailwind CSS to avoid CDN warnings -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -189,7 +189,7 @@
         <aside class="hidden lg:flex w-72 bg-slate-900 text-white flex-col flex-shrink-0 z-20 shadow-2xl relative">
             <div class="h-20 flex items-center px-8 border-b border-slate-800 bg-slate-900">
                 <i class="fas fa-cube text-industrial-yellow text-2xl mr-3"></i>
-                <span class="text-xl font-heading font-bold tracking-tight">Machining<span class="text-industrial-yellow">Hub</span></span>
+                <span class="text-xl font-heading font-bold tracking-tight">Medish <span class="text-industrial-yellow">Machinery</span></span>
             </div>
 
             <!-- Profile Widget -->
@@ -1257,12 +1257,7 @@
                                 </span>
                             </div>
                             
-                            <div class="flex items-center mb-4">
-                                <span class="text-yellow-500 text-sm">⭐</span>
-                                <span class="font-semibold text-sm ml-1">${m.rating || '4.5'}</span>
-                                <span class="mx-2">•</span>
-                                <span class="text-sm text-gray-600">${m.common?.year || 'N/A'}</span>
-                            </div>
+                           
                             
                             ${m.safetyNotes ? `
                             <div class="mb-4 text-sm text-gray-600 bg-yellow-50 p-3 rounded-xl border-l-4 border-yellow-500">
@@ -1572,6 +1567,7 @@
             if (o.status === 'confirmed') statusText = 'Confirmed';
             if (o.status === 'completed') statusText = 'Completed';
             if (o.status === 'cancelled') statusText = 'Cancelled';
+            if (o.status === 'rejected') statusText = 'Rejected';
 
             // Determine button text based on status
             let buttonText = 'Mark as Paid';
@@ -1743,11 +1739,20 @@
       }
 
       let actionButton = '';
-      if (order.status !== 'completed' && order.status !== 'cancelled') {
+      if (order.status !== 'completed' && order.status !== 'cancelled' && order.status !== 'rejected') {
         actionButton = `
             <button onclick="markOrderAsPaid('${order.id}')" class="px-6 py-3 bg-industrial-yellow text-industrial-gray font-bold rounded-xl hover:bg-industrial-orange transition-colors">
                 Mark as Paid
             </button>
+            <button onclick="rejectOrder('${order.id}')" class="px-6 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">
+                <i class="fas fa-times-circle mr-2"></i>Reject Order
+            </button>
+        `;
+      } else if (order.status === 'rejected') {
+        actionButton = `
+            <div class="text-red-600 font-bold">
+                <i class="fas fa-ban mr-2"></i>Order Rejected
+            </div>
         `;
       }
 
@@ -1803,8 +1808,29 @@
                 </div>
             </div>
         </div>
-        
-        <div class="mt-6">
+        <div class="mt-6 bg-blue-50 p-6 rounded-2xl border-l-4 border-blue-500">
+          <h4 class="font-heading font-bold text-lg mb-3"><i class="fas fa-dollar-sign mr-2"></i>Pricing Details</h4>
+          <div class="space-y-2">
+            ${order.originalPrice ? `
+              <div class="flex justify-between">
+                <span class="text-gray-700">Original Base Price:</span>
+                <span class="${order.counterOffer ? 'line-through text-gray-400' : 'font-bold text-gray-800'}">$${order.originalPrice.toLocaleString()}</span>
+              </div>
+            ` : ''}
+            ${order.counterOffer ? `
+              <div class="flex justify-between items-center bg-yellow-100 -mx-2 px-2 py-2 rounded">
+                <span class="text-gray-700 font-medium"><i class="fas fa-handshake mr-2 text-orange-600"></i>Customer Counter Offer:</span>
+                <span class="font-bold text-green-600 text-lg">$${order.counterOffer.price.toLocaleString()}</span>
+              </div>
+              ${order.counterOffer.notes ? `
+                <div class="mt-2 p-3 bg-white rounded border border-yellow-200">
+                  <p class="text-sm text-gray-600"><span class="font-medium">Negotiation Notes:</span> ${order.counterOffer.notes}</p>
+                </div>
+              ` : ''}
+            ` : ''}
+          </div>
+        </div>
+                <div class="mt-6">
             <h4 class="font-heading font-bold text-lg mb-3">Order Items</h4>
             <div class="space-y-2">
                 ${itemsHtml}
@@ -1834,10 +1860,38 @@
                 </button>
             </div>
         </div>
-    `;
+      `;
 
       document.getElementById('orderDetailContent').innerHTML = content;
       document.getElementById('orderDetailsModal').classList.remove('hidden');
+    }
+
+
+    function rejectOrder(orderId) {
+      if (!confirm('Are you sure you want to reject this order? This action cannot be undone.')) {
+        return;
+      }
+
+      const reason = prompt('Please provide a rejection reason (optional):');
+      
+      let orders = getOrders();
+      const orderIndex = orders.findIndex(o => o.id === orderId);
+      
+      if (orderIndex === -1) {
+        showNotification('Error', 'Order not found', 'error');
+        return;
+      }
+
+      orders[orderIndex].status = 'rejected';
+      orders[orderIndex].rejectedAt = new Date().toISOString();
+      orders[orderIndex].rejectionReason = reason || 'No reason provided';
+      
+      setOrders(orders);
+      
+      showNotification('Order Rejected', `Order ${orderId} has been rejected`, 'success');
+      closeOrderDetails();
+      renderOrders();
+      renderDashboard();
     }
 
     function closeOrderDetails() {
